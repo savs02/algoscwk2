@@ -25,3 +25,7 @@ target_include_directories(checkpoint2 PRIVATE ${CMAKE_SOURCE_DIR}/src)
 # --- Checkpoint 3 ---
 add_executable(checkpoint3 src/checkpoint3.cpp)
 target_include_directories(checkpoint3 PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+# --- Checkpoint 4 ---
+add_executable(checkpoint4 src/checkpoint4.cpp)
+target_include_directories(checkpoint4 PRIVATE ${CMAKE_SOURCE_DIR}/src)

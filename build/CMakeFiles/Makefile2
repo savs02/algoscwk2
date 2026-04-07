@@ -66,12 +66,14 @@ CMAKE_BINARY_DIR = /Users/savanisawaikar/algoscwk2/build
 all: CMakeFiles/checkpoint1.dir/all
 all: CMakeFiles/checkpoint2.dir/all
 all: CMakeFiles/checkpoint3.dir/all
+all: CMakeFiles/checkpoint4.dir/all
 .PHONY : all
 
 # The main recursive "codegen" target.
 codegen: CMakeFiles/checkpoint1.dir/codegen
 codegen: CMakeFiles/checkpoint2.dir/codegen
 codegen: CMakeFiles/checkpoint3.dir/codegen
+codegen: CMakeFiles/checkpoint4.dir/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
@@ -82,6 +84,7 @@ preinstall:
 clean: CMakeFiles/checkpoint1.dir/clean
 clean: CMakeFiles/checkpoint2.dir/clean
 clean: CMakeFiles/checkpoint3.dir/clean
+clean: CMakeFiles/checkpoint4.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -179,6 +182,38 @@ CMakeFiles/checkpoint3.dir/codegen:
 CMakeFiles/checkpoint3.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint3.dir/build.make CMakeFiles/checkpoint3.dir/clean
 .PHONY : CMakeFiles/checkpoint3.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/checkpoint4.dir
+
+# All Build rule for target.
+CMakeFiles/checkpoint4.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint4.dir/build.make CMakeFiles/checkpoint4.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint4.dir/build.make CMakeFiles/checkpoint4.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/savanisawaikar/algoscwk2/build/CMakeFiles --progress-num=7,8 "Built target checkpoint4"
+.PHONY : CMakeFiles/checkpoint4.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/checkpoint4.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/savanisawaikar/algoscwk2/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/checkpoint4.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/savanisawaikar/algoscwk2/build/CMakeFiles 0
+.PHONY : CMakeFiles/checkpoint4.dir/rule
+
+# Convenience name for target.
+checkpoint4: CMakeFiles/checkpoint4.dir/rule
+.PHONY : checkpoint4
+
+# codegen rule for target.
+CMakeFiles/checkpoint4.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint4.dir/build.make CMakeFiles/checkpoint4.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/savanisawaikar/algoscwk2/build/CMakeFiles --progress-num=7,8 "Finished codegen for target checkpoint4"
+.PHONY : CMakeFiles/checkpoint4.dir/codegen
+
+# clean rule for target.
+CMakeFiles/checkpoint4.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint4.dir/build.make CMakeFiles/checkpoint4.dir/clean
+.PHONY : CMakeFiles/checkpoint4.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.
