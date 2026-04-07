@@ -3,5 +3,6 @@
 /Users/savanisawaikar/algoscwk2/build/CMakeFiles/checkpoint3.dir
 /Users/savanisawaikar/algoscwk2/build/CMakeFiles/checkpoint4.dir
 /Users/savanisawaikar/algoscwk2/build/CMakeFiles/checkpoint5.dir
+/Users/savanisawaikar/algoscwk2/build/CMakeFiles/checkpoint6.dir
 /Users/savanisawaikar/algoscwk2/build/CMakeFiles/edit_cache.dir
 /Users/savanisawaikar/algoscwk2/build/CMakeFiles/rebuild_cache.dir
