@@ -7,18 +7,16 @@
 //   Epoch 2: mu=2.0 → median ≈  7.4
 //   Epoch 3: mu=2.5 → median ≈ 12.2  (high latency)
 //
-// Pass criteria
-// -------------
-//   1. Histogram peaks shift monotonically from low bins (epoch 0) to
-//      high bins (epoch 3), confirming each sketch only holds its own epoch.
-//   2. Per-epoch estimated packet count for the test key is within a few
-//      counts of the ground truth (CMS overestimation is expected but small).
-//   3. Each stored snapshot matches its own epoch's ground-truth histogram
-//      better than any other epoch's histogram.
+// Pass criteria (applied to all three sketch types: CMS, CU-CMS, CS)
+// ------------------------------------------------------------------
+//   1. items_processed == K * EPOCH_SIZE, snapshots_available == K.
+//   2. Histogram peak bins are non-decreasing across epochs.
+//   3. Each snapshot best-matches (L1) its own epoch's ground truth.
 
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -30,6 +28,8 @@
 
 #include "sketches/bin_config.hpp"
 #include "sketches/cms.hpp"
+#include "sketches/cu_cms.hpp"
+#include "sketches/cs.hpp"
 #include "temporal/epoch_manager.hpp"
 #include "temporal/stream_processor.hpp"
 
@@ -48,35 +48,125 @@ public:
 };
 
 // ---------------------------------------------------------------------------
+// Run the isolation test for one sketch type.
+// Returns true if all three criteria pass.
+// ---------------------------------------------------------------------------
 
-int main() {
-    constexpr int      K            = 4;
-    constexpr int      EPOCH_SIZE   = 2500;
-    constexpr int      W            = 1024;
-    constexpr int      D            = 3;
-    constexpr int      N_MAX_KEY    = 1000;
-    constexpr uint32_t SEED         = 42;
-    const std::string  TEST_KEY     = "1";
-
-    // Bin config: 8 uniform bins over [0, 30].
-    BinConfig cfg(8, 0.0, 30.0, BinScheme::Uniform);
-
-    // Factory creates a fresh CMS sketch for each epoch slot.
-    auto factory = [&]() -> EpochManager::SketchPtr {
-        return std::make_unique<CountMinSketch>(W, D, cfg);
-    };
-
+static bool run_isolation_test(
+    const std::string&                             sketch_name,
+    const std::function<EpochManager::SketchPtr()>& factory,
+    const std::vector<std::pair<std::string,double>>& stream, // pre-generated
+    const std::array<std::vector<int>, 4>&           gt,
+    const std::array<int, 4>&                        gt_count,
+    const BinConfig&                                 cfg,
+    int K, int EPOCH_SIZE,
+    const std::array<double,4>& mus)
+{
     EpochManager    epoch_mgr(K, factory);
     StreamProcessor proc(epoch_mgr, EPOCH_SIZE);
 
+    for (const auto& [key, lat] : stream)
+        proc.process(key, lat);
+
+    // Sanity checks.
+    if (proc.items_processed() != K * EPOCH_SIZE) {
+        std::cerr << sketch_name << ": FAIL — item count mismatch\n";
+        return false;
+    }
+    if (epoch_mgr.snapshots_available() != K) {
+        std::cerr << sketch_name << ": FAIL — snapshots_available mismatch\n";
+        return false;
+    }
+
+    const std::string TEST_KEY = "1";
+    const int         B        = cfg.num_bins();
+    const auto&       edges    = cfg.edges();
+
+    std::array<std::vector<double>, 4> est;
+    for (int e = 0; e < K; ++e)
+        est[e] = epoch_mgr.get_previous_sketch(K - 1 - e).query_histogram(TEST_KEY);
+
+    // --- Print histogram table ---
+    std::cout << "\n--- " << sketch_name << " ---\n";
+    std::cout << std::setw(4) << "Bin" << std::setw(16) << "Range";
+    for (int e = 0; e < K; ++e)
+        std::cout << std::setw(9) << ("E"+std::to_string(e)+" true")
+                  << std::setw(8) << ("E"+std::to_string(e)+" est");
+    std::cout << "\n" << std::string(4 + 16 + K * 17, '-') << "\n";
+
+    for (int b = 0; b < B; ++b) {
+        std::ostringstream range;
+        range << std::fixed << std::setprecision(1)
+              << "[" << edges[b] << "," << edges[b+1] << ")";
+        std::cout << std::setw(4) << b << std::setw(16) << range.str();
+        for (int e = 0; e < K; ++e)
+            std::cout << std::setw(9)  << gt[e][b]
+                      << std::setw(8)  << std::fixed << std::setprecision(0) << est[e][b];
+        std::cout << "\n";
+    }
+
+    // --- Check A: monotone peak bins ---
+    bool monotone  = true;
+    int  prev_peak = -1;
+    std::cout << "\nCheck A (peak shift):\n";
+    for (int e = 0; e < K; ++e) {
+        int peak = static_cast<int>(
+            std::max_element(est[e].begin(), est[e].end()) - est[e].begin());
+        std::ostringstream r;
+        r << std::fixed << std::setprecision(1)
+          << "[" << edges[peak] << "," << edges[peak+1] << ")";
+        std::cout << "  E" << e << " mu=" << mus[e]
+                  << " peak=" << peak << " " << r.str() << "\n";
+        if (peak < prev_peak) monotone = false;
+        prev_peak = peak;
+    }
+
+    // --- Check B: each snapshot best-matches its own ground truth (L1) ---
+    bool best_match_ok = true;
+    std::cout << "Check B (L1 self-match):\n";
+    for (int e = 0; e < K; ++e) {
+        double best_l1      = std::numeric_limits<double>::infinity();
+        int    best_gt      = -1;
+        for (int g = 0; g < K; ++g) {
+            double l1 = 0.0;
+            for (int b = 0; b < B; ++b)
+                l1 += std::abs(est[e][b] - static_cast<double>(gt[g][b]));
+            if (l1 < best_l1) { best_l1 = l1; best_gt = g; }
+        }
+        std::cout << "  Snapshot E" << e << " best matches GT epoch "
+                  << best_gt << "  L1=" << std::fixed << std::setprecision(1)
+                  << best_l1 << "\n";
+        if (best_gt != e) best_match_ok = false;
+    }
+
+    bool pass = monotone && best_match_ok;
+    std::cout << (pass ? "PASS" : "FAIL") << " — " << sketch_name << "\n";
+    return pass;
+}
+
+// ---------------------------------------------------------------------------
+
+int main() {
+    constexpr int      K          = 4;
+    constexpr int      EPOCH_SIZE = 2500;
+    constexpr int      W          = 1024;
+    constexpr int      D          = 3;
+    constexpr int      N_MAX_KEY  = 1000;
+    constexpr uint32_t SEED       = 42;
+    const std::string  TEST_KEY   = "1";
+
+    BinConfig cfg(8, 0.0, 30.0, BinScheme::Uniform);
+
+    const std::array<double, 4> mus   = {1.0, 1.5, 2.0, 2.5};
+    constexpr double             SIGMA = 0.3;
+
+    // Generate the stream once; replay it for each sketch type.
     std::mt19937     rng(SEED);
     ZipfDistribution zipf(N_MAX_KEY, 1.5);
 
-    // Shifting lognormal means across epochs.
-    const std::array<double, 4> mus    = {1.0, 1.5, 2.0, 2.5};
-    constexpr double             SIGMA = 0.3;
+    std::vector<std::pair<std::string, double>> stream;
+    stream.reserve(K * EPOCH_SIZE);
 
-    // Per-epoch ground truth for TEST_KEY.
     std::array<std::vector<int>, K> gt;
     std::array<int, K>              gt_count = {};
     for (auto& h : gt) h.assign(cfg.num_bins(), 0);
@@ -86,7 +176,7 @@ int main() {
         for (int i = 0; i < EPOCH_SIZE; ++i) {
             std::string key = std::to_string(zipf.sample(rng));
             double      lat = lat_dist(rng);
-            proc.process(key, lat);
+            stream.push_back({key, lat});
             if (key == TEST_KEY) {
                 gt[e][cfg.get_bin(lat)]++;
                 gt_count[e]++;
@@ -94,132 +184,27 @@ int main() {
         }
     }
 
-    if (proc.items_processed() != K * EPOCH_SIZE) {
-        std::cerr << "FAIL — processed item count mismatch\n";
-        return 1;
-    }
-    if (epoch_mgr.snapshots_available() != K) {
-        std::cerr << "FAIL — expected " << K << " snapshots, found "
-                  << epoch_mgr.snapshots_available() << "\n";
-        return 1;
-    }
-
-    // After K full epochs the ring buffer layout is:
-    //   get_previous_sketch(0) = epoch K-1 (most recent)
-    //   get_previous_sketch(K-1-e) = epoch e
-    const auto& edges = cfg.edges();
-    int         B     = cfg.num_bins();
-
-    // -----------------------------------------------------------------------
-    // Print header
-
     std::cout << "Checkpoint 3  |  " << K << " epochs × " << EPOCH_SIZE
-              << " items = " << K * EPOCH_SIZE << " total"
-              << ", w=" << W << ", d=" << D << "\n";
-    std::cout << "Latency: lognormal(sigma=" << SIGMA << "), mu shifts each epoch\n\n";
-    for (int e = 0; e < K; ++e) {
-        std::cout << "  Epoch " << e << ": mu=" << mus[e]
-                  << "  median=" << std::fixed << std::setprecision(1)
-                  << std::exp(mus[e]) << "\n";
-    }
-
-    // -----------------------------------------------------------------------
-    // Per-epoch histogram table for TEST_KEY
-
-    std::cout << "\nHistograms for flow \"" << TEST_KEY << "\"  [truth | estimate per epoch]\n";
-
-    // Column widths: bin + range + K*(truth+est) columns
-    std::cout << std::setw(4) << "Bin" << std::setw(16) << "Range";
+              << " = " << K * EPOCH_SIZE << " items, w=" << W << ", d=" << D << "\n";
+    std::cout << "lognormal(sigma=" << SIGMA << "), mu per epoch: ";
     for (int e = 0; e < K; ++e)
-        std::cout << std::setw(9) << ("E" + std::to_string(e) + " true")
-                  << std::setw(8) << ("E" + std::to_string(e) + " est");
-    std::cout << "\n" << std::string(4 + 16 + K * 17, '-') << "\n";
+        std::cout << mus[e] << (e < K-1 ? " → " : "\n");
+    std::cout << "All three sketch types must independently pass isolation.\n";
 
-    // Retrieve per-epoch sketches (offset = K-1-e maps epoch e → ring slot).
-    std::array<std::vector<double>, K> est;
-    for (int e = 0; e < K; ++e)
-        est[e] = epoch_mgr.get_previous_sketch(K - 1 - e).query_histogram(TEST_KEY);
+    bool all_pass = true;
 
-    for (int b = 0; b < B; ++b) {
-        std::ostringstream range;
-        range << std::fixed << std::setprecision(1)
-              << "[" << edges[b] << "," << edges[b + 1] << ")";
+    all_pass &= run_isolation_test("CMS",
+        [&]{ return std::make_unique<CountMinSketch>(W, D, cfg); },
+        stream, gt, gt_count, cfg, K, EPOCH_SIZE, mus);
 
-        std::cout << std::setw(4) << b << std::setw(16) << range.str();
-        for (int e = 0; e < K; ++e) {
-            std::cout << std::setw(9)  << gt[e][b]
-                      << std::setw(8)  << std::fixed << std::setprecision(0)
-                      << est[e][b];
-        }
-        std::cout << "\n";
-    }
+    all_pass &= run_isolation_test("CU-CMS",
+        [&]{ return std::make_unique<ConservativeUpdateCMS>(W, D, cfg); },
+        stream, gt, gt_count, cfg, K, EPOCH_SIZE, mus);
 
-    // -----------------------------------------------------------------------
-    // Epoch totals: ground truth count vs sketch total
+    all_pass &= run_isolation_test("CS",
+        [&]{ return std::make_unique<CountSketch>(W, D, cfg); },
+        stream, gt, gt_count, cfg, K, EPOCH_SIZE, mus);
 
-    std::cout << "\nEpoch totals for flow \"" << TEST_KEY << "\":\n";
-    std::cout << std::setw(7)  << "Epoch"
-              << std::setw(10) << "True"
-              << std::setw(12) << "Estimated"
-              << std::setw(10) << "Error\n";
-    std::cout << std::string(39, '-') << "\n";
-
-    for (int e = 0; e < K; ++e) {
-        double est_total = 0;
-        for (double v : est[e]) est_total += v;
-        std::cout << std::setw(7)  << e
-                  << std::setw(10) << gt_count[e]
-                  << std::setw(12) << std::fixed << std::setprecision(0) << est_total
-                  << std::setw(10) << std::showpos << std::fixed << std::setprecision(0)
-                  << (est_total - gt_count[e]) << std::noshowpos << "\n";
-    }
-
-    // -----------------------------------------------------------------------
-    // Isolation checks
-
-    std::cout << "\nIsolation check A — peak bin shifts as latency mean rises:\n";
-    int prev_peak = -1;
-    bool monotone = true;
-    for (int e = 0; e < K; ++e) {
-        int peak = static_cast<int>(
-            std::max_element(est[e].begin(), est[e].end()) - est[e].begin());
-        std::ostringstream range;
-        range << std::fixed << std::setprecision(1)
-              << "[" << edges[peak] << "," << edges[peak + 1] << ")";
-        std::cout << "  Epoch " << e << " (mu=" << mus[e]
-                  << ", median=" << std::fixed << std::setprecision(1)
-                  << std::exp(mus[e]) << "): peak bin "
-                  << peak << "  " << range.str() << "\n";
-        if (peak < prev_peak) monotone = false;
-        prev_peak = peak;
-    }
-
-    std::cout << "\nIsolation check B — each snapshot best matches its own epoch:\n";
-    bool best_match_ok = true;
-    for (int e = 0; e < K; ++e) {
-        double best_l1 = std::numeric_limits<double>::infinity();
-        int    best_gt_epoch = -1;
-        for (int g = 0; g < K; ++g) {
-            double l1 = 0.0;
-            for (int b = 0; b < B; ++b)
-                l1 += std::abs(est[e][b] - static_cast<double>(gt[g][b]));
-            if (l1 < best_l1) {
-                best_l1 = l1;
-                best_gt_epoch = g;
-            }
-        }
-        std::cout << "  Snapshot epoch " << e << " best matches ground truth epoch "
-                  << best_gt_epoch << "  (L1=" << std::fixed << std::setprecision(0)
-                  << best_l1 << ")\n";
-        if (best_gt_epoch != e) best_match_ok = false;
-    }
-
-    bool pass = monotone && best_match_ok;
-    std::cout << "\n" << (pass ? "PASS" : "FAIL")
-              << " — peak bins are "
-              << (monotone ? "non-decreasing" : "not monotone")
-              << " and snapshot/epoch matching is "
-              << (best_match_ok ? "correct" : "incorrect") << "\n";
-
-    return pass ? 0 : 1;
+    std::cout << "\n" << (all_pass ? "ALL PASS" : "SOME FAILED") << "\n";
+    return all_pass ? 0 : 1;
 }
