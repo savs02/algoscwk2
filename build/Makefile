@@ -142,6 +142,19 @@ checkpoint2/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint2.dir/build.make CMakeFiles/checkpoint2.dir/build
 .PHONY : checkpoint2/fast
 
+#=============================================================================
+# Target rules for targets named checkpoint3
+
+# Build rule for target.
+checkpoint3: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 checkpoint3
+.PHONY : checkpoint3
+
+# fast build rule for target.
+checkpoint3/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint3.dir/build.make CMakeFiles/checkpoint3.dir/build
+.PHONY : checkpoint3/fast
+
 src/checkpoint1.o: src/checkpoint1.cpp.o
 .PHONY : src/checkpoint1.o
 
@@ -190,6 +203,30 @@ src/checkpoint2.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint2.dir/build.make CMakeFiles/checkpoint2.dir/src/checkpoint2.cpp.s
 .PHONY : src/checkpoint2.cpp.s
 
+src/checkpoint3.o: src/checkpoint3.cpp.o
+.PHONY : src/checkpoint3.o
+
+# target to build an object file
+src/checkpoint3.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint3.dir/build.make CMakeFiles/checkpoint3.dir/src/checkpoint3.cpp.o
+.PHONY : src/checkpoint3.cpp.o
+
+src/checkpoint3.i: src/checkpoint3.cpp.i
+.PHONY : src/checkpoint3.i
+
+# target to preprocess a source file
+src/checkpoint3.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint3.dir/build.make CMakeFiles/checkpoint3.dir/src/checkpoint3.cpp.i
+.PHONY : src/checkpoint3.cpp.i
+
+src/checkpoint3.s: src/checkpoint3.cpp.s
+.PHONY : src/checkpoint3.s
+
+# target to generate assembly for a file
+src/checkpoint3.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint3.dir/build.make CMakeFiles/checkpoint3.dir/src/checkpoint3.cpp.s
+.PHONY : src/checkpoint3.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -200,12 +237,16 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... checkpoint1"
 	@echo "... checkpoint2"
+	@echo "... checkpoint3"
 	@echo "... src/checkpoint1.o"
 	@echo "... src/checkpoint1.i"
 	@echo "... src/checkpoint1.s"
 	@echo "... src/checkpoint2.o"
 	@echo "... src/checkpoint2.i"
 	@echo "... src/checkpoint2.s"
+	@echo "... src/checkpoint3.o"
+	@echo "... src/checkpoint3.i"
+	@echo "... src/checkpoint3.s"
 .PHONY : help
 
 
