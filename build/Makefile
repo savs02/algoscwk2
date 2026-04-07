@@ -168,6 +168,19 @@ checkpoint4/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint4.dir/build.make CMakeFiles/checkpoint4.dir/build
 .PHONY : checkpoint4/fast
 
+#=============================================================================
+# Target rules for targets named checkpoint5
+
+# Build rule for target.
+checkpoint5: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 checkpoint5
+.PHONY : checkpoint5
+
+# fast build rule for target.
+checkpoint5/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint5.dir/build.make CMakeFiles/checkpoint5.dir/build
+.PHONY : checkpoint5/fast
+
 src/checkpoint1.o: src/checkpoint1.cpp.o
 .PHONY : src/checkpoint1.o
 
@@ -264,6 +277,30 @@ src/checkpoint4.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint4.dir/build.make CMakeFiles/checkpoint4.dir/src/checkpoint4.cpp.s
 .PHONY : src/checkpoint4.cpp.s
 
+src/checkpoint5.o: src/checkpoint5.cpp.o
+.PHONY : src/checkpoint5.o
+
+# target to build an object file
+src/checkpoint5.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint5.dir/build.make CMakeFiles/checkpoint5.dir/src/checkpoint5.cpp.o
+.PHONY : src/checkpoint5.cpp.o
+
+src/checkpoint5.i: src/checkpoint5.cpp.i
+.PHONY : src/checkpoint5.i
+
+# target to preprocess a source file
+src/checkpoint5.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint5.dir/build.make CMakeFiles/checkpoint5.dir/src/checkpoint5.cpp.i
+.PHONY : src/checkpoint5.cpp.i
+
+src/checkpoint5.s: src/checkpoint5.cpp.s
+.PHONY : src/checkpoint5.s
+
+# target to generate assembly for a file
+src/checkpoint5.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint5.dir/build.make CMakeFiles/checkpoint5.dir/src/checkpoint5.cpp.s
+.PHONY : src/checkpoint5.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -276,6 +313,7 @@ help:
 	@echo "... checkpoint2"
 	@echo "... checkpoint3"
 	@echo "... checkpoint4"
+	@echo "... checkpoint5"
 	@echo "... src/checkpoint1.o"
 	@echo "... src/checkpoint1.i"
 	@echo "... src/checkpoint1.s"
@@ -288,6 +326,9 @@ help:
 	@echo "... src/checkpoint4.o"
 	@echo "... src/checkpoint4.i"
 	@echo "... src/checkpoint4.s"
+	@echo "... src/checkpoint5.o"
+	@echo "... src/checkpoint5.i"
+	@echo "... src/checkpoint5.s"
 .PHONY : help
 
 
