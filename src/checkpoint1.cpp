@@ -1,6 +1,6 @@
 // Checkpoint 1 — Basic sketch accuracy on a Zipf frequency stream.
 //
-// Inserts 10 000 items whose keys are drawn from a Zipf distribution
+// Inserts N_ITEMS (10 000) keys drawn from a Zipf distribution
 // (value = 1 each, pure frequency counting — no histograms yet).
 // Queries every unique key against ground truth and prints:
 //   avg signed error, avg absolute error, max absolute error.

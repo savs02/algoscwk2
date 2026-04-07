@@ -1,7 +1,8 @@
 #pragma once
-#include <vector>
+#include <cassert>
 #include <cstdint>
 #include <limits>
+#include <vector>
 #include "base_sketch.hpp"
 
 // ---------------------------------------------------------------------------
@@ -26,6 +27,7 @@ public:
           counters_(d, std::vector<int32_t>(w, 0)) {}
 
     void update(const std::string& key, int value) override {
+        assert(value >= 0 && "CU-CMS only supports non-negative updates");
         // Compute current estimate (min across rows).
         int32_t estimate = std::numeric_limits<int32_t>::max();
         for (int j = 0; j < d_; ++j) {

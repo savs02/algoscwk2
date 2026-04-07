@@ -1,7 +1,8 @@
 #pragma once
-#include <vector>
+#include <cassert>
 #include <cstdint>
 #include <limits>
+#include <vector>
 #include "base_sketch.hpp"
 
 // ---------------------------------------------------------------------------
@@ -22,6 +23,7 @@ public:
           counters_(d, std::vector<int32_t>(w, 0)) {}
 
     void update(const std::string& key, int value) override {
+        assert(value >= 0 && "CMS only supports non-negative updates");
         for (int j = 0; j < d_; ++j)
             counters_[j][hash_pos(key, j)] += static_cast<int32_t>(value);
     }
