@@ -35,7 +35,12 @@
 // ---------------------------------------------------------------------------
 
 class StreamProcessor {
+public:
+    enum class EpochMode { ItemCount, Time };
+
+private:
     EpochManager& epoch_mgr_;
+    EpochMode     mode_;
     double        epoch_duration_;   // items (item mode) or seconds (time mode)
     int           items_in_epoch_;
     int           items_processed_;
@@ -45,6 +50,7 @@ public:
     // Item-count mode.
     StreamProcessor(EpochManager& epoch_mgr, int epoch_duration)
         : epoch_mgr_(epoch_mgr),
+          mode_(EpochMode::ItemCount),
           epoch_duration_(static_cast<double>(epoch_duration)),
           items_in_epoch_(0),
           items_processed_(0),
@@ -56,6 +62,7 @@ public:
     // Timestamp mode — epoch_duration is in the same unit as timestamps.
     StreamProcessor(EpochManager& epoch_mgr, double epoch_duration_seconds)
         : epoch_mgr_(epoch_mgr),
+          mode_(EpochMode::Time),
           epoch_duration_(epoch_duration_seconds),
           items_in_epoch_(0),
           items_processed_(0),
@@ -68,6 +75,8 @@ public:
     // Item-count mode: process one packet.
     // Advances the epoch lazily when the current epoch is full.
     void process(const std::string& key, double value) {
+        assert(mode_ == EpochMode::ItemCount
+               && "use process(timestamp, key, value) in timestamp mode");
         if (items_in_epoch_ >= static_cast<int>(epoch_duration_)) {
             epoch_mgr_.advance_epoch();
             items_in_epoch_ = 0;
@@ -82,9 +91,15 @@ public:
     // Anchors the first epoch to the first timestamp seen.
     // Handles consecutive advances if a large gap exists between packets.
     void process(double timestamp, const std::string& key, double value) {
+        assert(mode_ == EpochMode::Time
+               && "use process(key, value) in item-count mode");
+        assert(timestamp >= 0.0 && "timestamps must be non-negative");
+
         // Anchor the first epoch on the first call.
         if (items_processed_ == 0)
             epoch_start_time_ = timestamp;
+
+        assert(timestamp >= epoch_start_time_ && "timestamps must be non-decreasing");
 
         // Advance as many times as needed to cover the current timestamp.
         while (timestamp >= epoch_start_time_ + epoch_duration_) {
@@ -101,4 +116,6 @@ public:
     int    items_in_epoch()  const { return items_in_epoch_; }
     double epoch_duration()  const { return epoch_duration_; }
     int    items_processed() const { return items_processed_; }
+    EpochMode mode() const { return mode_; }
+    double epoch_start_time() const { return epoch_start_time_; }
 };

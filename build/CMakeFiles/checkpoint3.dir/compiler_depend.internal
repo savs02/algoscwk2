@@ -877,6 +877,8 @@ CMakeFiles/checkpoint3.dir/src/checkpoint3.cpp.o
  /Users/savanisawaikar/algoscwk2/src/sketches/base_sketch.hpp
  /Users/savanisawaikar/algoscwk2/src/sketches/bin_config.hpp
  /Users/savanisawaikar/algoscwk2/src/sketches/cms.hpp
+ /Users/savanisawaikar/algoscwk2/src/sketches/cs.hpp
+ /Users/savanisawaikar/algoscwk2/src/sketches/cu_cms.hpp
  /Users/savanisawaikar/algoscwk2/src/sketches/base_sketch.hpp
  /Users/savanisawaikar/algoscwk2/src/temporal/epoch_manager.hpp
  /Users/savanisawaikar/algoscwk2/src/temporal/stream_processor.hpp

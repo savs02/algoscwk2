@@ -1,6 +1,7 @@
 // Checkpoint 3 — Temporal snapshotting and epoch isolation.
 //
-// Stream: 4 epochs × 2500 items = 10 000 total.
+// Stream: 4 time-based epochs × 2500 items = 10 000 total.
+// Input to the stream processor is explicit (timestamp, key, value) tuples.
 // Each epoch uses a different lognormal mean so histograms shift predictably:
 //   Epoch 0: mu=1.0 → median ≈  2.7  (low latency)
 //   Epoch 1: mu=1.5 → median ≈  4.5
@@ -24,6 +25,7 @@
 #include <random>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "sketches/bin_config.hpp"
@@ -55,18 +57,18 @@ public:
 static bool run_isolation_test(
     const std::string&                             sketch_name,
     const std::function<EpochManager::SketchPtr()>& factory,
-    const std::vector<std::pair<std::string,double>>& stream, // pre-generated
+    const std::vector<std::tuple<double, std::string, double>>& stream,
     const std::array<std::vector<int>, 4>&           gt,
     const std::array<int, 4>&                        gt_count,
     const BinConfig&                                 cfg,
-    int K, int EPOCH_SIZE,
+    int K, int EPOCH_SIZE, double epoch_duration_seconds,
     const std::array<double,4>& mus)
 {
     EpochManager    epoch_mgr(K, factory);
-    StreamProcessor proc(epoch_mgr, EPOCH_SIZE);
+    StreamProcessor proc(epoch_mgr, epoch_duration_seconds);
 
-    for (const auto& [key, lat] : stream)
-        proc.process(key, lat);
+    for (const auto& [timestamp, key, lat] : stream)
+        proc.process(timestamp, key, lat);
 
     // Sanity checks.
     if (proc.items_processed() != K * EPOCH_SIZE) {
@@ -115,7 +117,7 @@ static bool run_isolation_test(
         std::ostringstream r;
         r << std::fixed << std::setprecision(1)
           << "[" << edges[peak] << "," << edges[peak+1] << ")";
-        std::cout << "  E" << e << " mu=" << mus[e]
+        std::cout << "  E" << e << " mu=" << std::fixed << std::setprecision(1) << mus[e]
                   << " peak=" << peak << " " << r.str() << "\n";
         if (peak < prev_peak) monotone = false;
         prev_peak = peak;
@@ -147,13 +149,14 @@ static bool run_isolation_test(
 // ---------------------------------------------------------------------------
 
 int main() {
-    constexpr int      K          = 4;
-    constexpr int      EPOCH_SIZE = 2500;
-    constexpr int      W          = 1024;
-    constexpr int      D          = 3;
-    constexpr int      N_MAX_KEY  = 1000;
-    constexpr uint32_t SEED       = 42;
-    const std::string  TEST_KEY   = "1";
+    constexpr int      K                      = 4;
+    constexpr int      EPOCH_SIZE             = 2500;
+    constexpr double   EPOCH_DURATION_SECONDS = 2500.0;
+    constexpr int      W                      = 1024;
+    constexpr int      D                      = 3;
+    constexpr int      N_MAX_KEY              = 1000;
+    constexpr uint32_t SEED                   = 42;
+    const std::string  TEST_KEY               = "1";
 
     BinConfig cfg(8, 0.0, 30.0, BinScheme::Uniform);
 
@@ -164,7 +167,7 @@ int main() {
     std::mt19937     rng(SEED);
     ZipfDistribution zipf(N_MAX_KEY, 1.5);
 
-    std::vector<std::pair<std::string, double>> stream;
+    std::vector<std::tuple<double, std::string, double>> stream;
     stream.reserve(K * EPOCH_SIZE);
 
     std::array<std::vector<int>, K> gt;
@@ -174,9 +177,10 @@ int main() {
     for (int e = 0; e < K; ++e) {
         std::lognormal_distribution<double> lat_dist(mus[e], SIGMA);
         for (int i = 0; i < EPOCH_SIZE; ++i) {
+            double      timestamp = e * EPOCH_DURATION_SECONDS + i;
             std::string key = std::to_string(zipf.sample(rng));
             double      lat = lat_dist(rng);
-            stream.push_back({key, lat});
+            stream.push_back({timestamp, key, lat});
             if (key == TEST_KEY) {
                 gt[e][cfg.get_bin(lat)]++;
                 gt_count[e]++;
@@ -186,6 +190,8 @@ int main() {
 
     std::cout << "Checkpoint 3  |  " << K << " epochs × " << EPOCH_SIZE
               << " = " << K * EPOCH_SIZE << " items, w=" << W << ", d=" << D << "\n";
+    std::cout << "Stream mode: (timestamp, key, value), epoch_duration="
+              << EPOCH_DURATION_SECONDS << " seconds\n";
     std::cout << "lognormal(sigma=" << SIGMA << "), mu per epoch: ";
     for (int e = 0; e < K; ++e)
         std::cout << mus[e] << (e < K-1 ? " → " : "\n");
@@ -195,15 +201,15 @@ int main() {
 
     all_pass &= run_isolation_test("CMS",
         [&]{ return std::make_unique<CountMinSketch>(W, D, cfg); },
-        stream, gt, gt_count, cfg, K, EPOCH_SIZE, mus);
+        stream, gt, gt_count, cfg, K, EPOCH_SIZE, EPOCH_DURATION_SECONDS, mus);
 
     all_pass &= run_isolation_test("CU-CMS",
         [&]{ return std::make_unique<ConservativeUpdateCMS>(W, D, cfg); },
-        stream, gt, gt_count, cfg, K, EPOCH_SIZE, mus);
+        stream, gt, gt_count, cfg, K, EPOCH_SIZE, EPOCH_DURATION_SECONDS, mus);
 
     all_pass &= run_isolation_test("CS",
         [&]{ return std::make_unique<CountSketch>(W, D, cfg); },
-        stream, gt, gt_count, cfg, K, EPOCH_SIZE, mus);
+        stream, gt, gt_count, cfg, K, EPOCH_SIZE, EPOCH_DURATION_SECONDS, mus);
 
     std::cout << "\n" << (all_pass ? "ALL PASS" : "SOME FAILED") << "\n";
     return all_pass ? 0 : 1;
