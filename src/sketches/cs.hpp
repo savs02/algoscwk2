@@ -1,49 +1,61 @@
 #pragma once
-#include <vector>
 #include <algorithm>
+#include <cstdint>
+#include <vector>
 #include "base_sketch.hpp"
 
 // ---------------------------------------------------------------------------
-// Count Sketch (CS)
+// CountSketch (CS) — histogram variant
 //
-// d hash functions mapping keys to [0, w) and d sign functions mapping
-// keys to {+1, -1}.  Signed increments mean collisions partially cancel
-// in expectation, giving unbiased (but higher-variance) estimates.
+// update : b = get_bin(value)
+//          for each row j: counters[j][hash_j(key)][b] += sign_j(key)
 //
-// update : for each row j, counters[j][hash_j(key)] += sign_j(key) * value
-// query  : median over j of (counters[j][hash_j(key)] * sign_j(key))
+// query  : for each bin b:
+//            row_estimate_j = counters[j][hash_j(key)][b] * sign_j(key)
+//            bin_estimate   = median over j of row_estimate_j
+//
+// Signed increments mean collisions partially cancel in expectation, giving
+// unbiased but higher-variance estimates relative to CMS.
 // ---------------------------------------------------------------------------
 
 class CountSketch : public BaseSketch {
-    std::vector<std::vector<int32_t>> counters_;
+    std::vector<std::vector<std::vector<int32_t>>> counters_;
 
 public:
-    CountSketch(int w = 1024, int d = 3)
-        : BaseSketch(w, d),
-          counters_(d, std::vector<int32_t>(w, 0)) {}
+    CountSketch(int w, int d, const BinConfig& bin_cfg)
+        : BaseSketch(w, d, bin_cfg),
+          counters_(d,
+              std::vector<std::vector<int32_t>>(
+                  w, std::vector<int32_t>(bin_cfg.num_bins(), 0)))
+    {}
 
-    void update(const std::string& key, int value) override {
+    void update(const std::string& key, double value) override {
+        int b = bin_cfg_.get_bin(value);
         for (int j = 0; j < d_; ++j)
-            counters_[j][hash_pos(key, j)] +=
-                static_cast<int32_t>(hash_sign(key, j) * value);
+            counters_[j][hash_pos(key, j)][b] += hash_sign(key, j);
     }
 
-    double query(const std::string& key) const override {
-        std::vector<double> estimates(d_);
-        for (int j = 0; j < d_; ++j)
-            estimates[j] = static_cast<double>(counters_[j][hash_pos(key, j)])
-                           * hash_sign(key, j);
+    std::vector<double> query_histogram(const std::string& key) const override {
+        int B = num_bins();
+        std::vector<double> hist(B);
+        std::vector<double> row_est(d_);
 
-        // Median via nth_element (O(d), in-place).
-        int mid = d_ / 2;
-        std::nth_element(estimates.begin(), estimates.begin() + mid, estimates.end());
-        if (d_ % 2 == 1) {
-            return estimates[mid];
-        } else {
-            // Even d: average the two middle values.
-            double upper = estimates[mid];
-            double lower = *std::max_element(estimates.begin(), estimates.begin() + mid);
-            return (lower + upper) / 2.0;
+        for (int b = 0; b < B; ++b) {
+            for (int j = 0; j < d_; ++j)
+                row_est[j] = static_cast<double>(counters_[j][hash_pos(key, j)][b])
+                             * hash_sign(key, j);
+
+            int mid = d_ / 2;
+            std::nth_element(row_est.begin(), row_est.begin() + mid, row_est.end());
+
+            if (d_ % 2 == 1) {
+                hist[b] = row_est[mid];
+            } else {
+                double upper = row_est[mid];
+                double lower = *std::max_element(row_est.begin(), row_est.begin() + mid);
+                hist[b] = (lower + upper) / 2.0;
+            }
         }
+        return hist;
     }
 };

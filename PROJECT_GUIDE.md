@@ -36,7 +36,7 @@ Build three outer sketch structures as classes. Each should support `update(key,
 - `query(key)`: return `median over j of (counters[j][hash_j(key)] * sign_j(key))`
 
 ### Checkpoint 1
-- Create a simple test: insert 1000 items from a Zipf distribution, query each, compare against ground truth
+- Create a simple test: insert 10000 items from a Zipf distribution, query each, compare against ground truth
 - Print average error for each sketch type
 - CMS should overestimate, CS should have errors in both directions, CU-CMS should overestimate less than CMS
 

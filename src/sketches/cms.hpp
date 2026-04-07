@@ -1,39 +1,48 @@
 #pragma once
-#include <cassert>
 #include <cstdint>
 #include <limits>
 #include <vector>
 #include "base_sketch.hpp"
 
 // ---------------------------------------------------------------------------
-// CountMinSketch (CMS)
+// CountMinSketch (CMS) — histogram variant
 //
-// update : for each row j, counters[j][hash_j(key)] += value
-// query  : min over j of counters[j][hash_j(key)]
+// counters_[row][bucket][bin]  — 3-D array of int32_t.
 //
-// Always overestimates — hash collisions only add noise, never subtract it.
+// update : get_bin(value) → b; for each row j, counters[j][hash_j(key)][b] += 1
+// query  : for each bin b, estimated count = min_j counters[j][hash_j(key)][b]
+//
+// Always overestimates per bin — collisions only add positive noise.
 // ---------------------------------------------------------------------------
 
 class CountMinSketch : public BaseSketch {
-    std::vector<std::vector<int32_t>> counters_;
+    std::vector<std::vector<std::vector<int32_t>>> counters_;
 
 public:
-    CountMinSketch(int w = 1024, int d = 3)
-        : BaseSketch(w, d),
-          counters_(d, std::vector<int32_t>(w, 0)) {}
+    CountMinSketch(int w, int d, const BinConfig& bin_cfg)
+        : BaseSketch(w, d, bin_cfg),
+          counters_(d,
+              std::vector<std::vector<int32_t>>(
+                  w, std::vector<int32_t>(bin_cfg.num_bins(), 0)))
+    {}
 
-    void update(const std::string& key, int value) override {
-        assert(value >= 0 && "CMS only supports non-negative updates");
+    void update(const std::string& key, double value) override {
+        int b = bin_cfg_.get_bin(value);
         for (int j = 0; j < d_; ++j)
-            counters_[j][hash_pos(key, j)] += static_cast<int32_t>(value);
+            counters_[j][hash_pos(key, j)][b] += 1;
     }
 
-    double query(const std::string& key) const override {
-        int32_t min_val = std::numeric_limits<int32_t>::max();
-        for (int j = 0; j < d_; ++j) {
-            int32_t v = counters_[j][hash_pos(key, j)];
-            if (v < min_val) min_val = v;
+    std::vector<double> query_histogram(const std::string& key) const override {
+        int B = num_bins();
+        std::vector<double> hist(B);
+        for (int b = 0; b < B; ++b) {
+            int32_t min_val = std::numeric_limits<int32_t>::max();
+            for (int j = 0; j < d_; ++j) {
+                int32_t v = counters_[j][hash_pos(key, j)][b];
+                if (v < min_val) min_val = v;
+            }
+            hist[b] = static_cast<double>(min_val);
         }
-        return static_cast<double>(min_val);
+        return hist;
     }
 };
