@@ -8,8 +8,8 @@
 //   Uniform:     8 bins, [0, 30]  → bin width = 3.75
 //   Logarithmic: 8 bins, [0.5, 30]
 //
-// For each config: select the 3 highest-frequency keys, print ground truth
-// histogram vs CMS / CU-CMS / CS estimates and per-bin errors.
+// For each config: select the 3 highest-frequency keys, print ground truth,
+// estimated histograms, and per-bin errors.
 //
 // Expected: CMS and CU-CMS overestimate per bin (non-negative errors).
 //           CS errors are signed (both over and under per bin).
@@ -84,11 +84,14 @@ static void run_checkpoint(const BinConfig& cfg, const std::string& scheme_name,
         std::cout << std::setw(5)  << "Bin"
                   << std::setw(18) << "Range"
                   << std::setw(8)  << "Truth"
+                  << std::setw(8)  << "CMS"
+                  << std::setw(8)  << "CU"
+                  << std::setw(8)  << "CS"
                   << std::setw(10) << "CMS err"
                   << std::setw(12) << "CU-CMS err"
                   << std::setw(10) << "CS err"
                   << "\n";
-        std::cout << std::string(63, '-') << "\n";
+        std::cout << std::string(87, '-') << "\n";
 
         for (int b = 0; b < B; ++b) {
             // Format bin range string.
@@ -99,8 +102,10 @@ static void run_checkpoint(const BinConfig& cfg, const std::string& scheme_name,
             std::cout << std::setw(5)  << b
                       << std::setw(18) << range.str()
                       << std::setw(8)  << truth[b]
-                      << std::setw(10) << std::showpos << std::fixed << std::setprecision(0)
-                      << (cms_hist[b]  - truth[b])
+                      << std::setw(8)  << std::fixed << std::setprecision(0) << cms_hist[b]
+                      << std::setw(8)  << cu_hist[b]
+                      << std::setw(8)  << cs_hist[b]
+                      << std::setw(10) << std::showpos << (cms_hist[b]  - truth[b])
                       << std::setw(12) << (cu_hist[b]   - truth[b])
                       << std::setw(10) << (cs_hist[b]   - truth[b])
                       << std::noshowpos << "\n";

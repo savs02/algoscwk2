@@ -23,6 +23,14 @@ class BinConfig {
     std::vector<double> edges_;   // length = num_bins_ + 1
 
 public:
+    explicit BinConfig(const std::vector<double>& bin_edges)
+        : num_bins_(static_cast<int>(bin_edges.size()) - 1), edges_(bin_edges)
+    {
+        assert(bin_edges.size() >= 2 && "bin_edges must contain at least two values");
+        for (size_t i = 1; i < edges_.size(); ++i)
+            assert(edges_[i] > edges_[i - 1] && "bin_edges must be strictly increasing");
+    }
+
     BinConfig(int num_bins, double min_val, double max_val,
               BinScheme scheme = BinScheme::Uniform)
         : num_bins_(num_bins), edges_(num_bins + 1)

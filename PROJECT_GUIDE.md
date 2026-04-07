@@ -67,7 +67,7 @@ Replace the single counter in each bucket with a small array of `B` counters (bi
   - Return the full histogram array of length `num_bins`
 
 ### Checkpoint 2
-- Insert 1000 items with keys from Zipf and values (latencies) from a known distribution (e.g., lognormal)
+- Insert 10000 items with keys from Zipf and values (latencies) from a known distribution (e.g., lognormal)
 - For a few specific keys, compare queried histogram against ground truth histogram
 - Print per-bin errors
 
