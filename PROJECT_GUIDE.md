@@ -330,13 +330,27 @@ At threshold=0.25 the two Spread boundary 1/2 false positives (L1_norm ≈ 0.21)
 
 ### Sketch type differentiation
 
-CMS, CU-CMS, and CS produce identical F1 scores in Stages 4–6. This is expected: for diff-based detection, the hash functions are fixed across epochs so overcount bias cancels identically in both sketches being differenced. The three types differ only in single-epoch histogram accuracy, which Stage 2 (w=64 check) directly measures and gates on.
+**Under same-seed epochs (normal operation):** CMS, CU-CMS, and CS produce identical F1 scores in Stages 4–6. This is expected: when the same hash seed is used across epochs, any systematic overcount bias in epoch *e* is exactly replicated in epoch *e+1* — it cancels in the diff. The three sketch types differ only in single-epoch histogram accuracy, which Stage 2 (w=64 check) directly measures and gates on.
 
-**Safe claim**: sketch differences are clearest in single-epoch estimation (Stage 2). Under the current end-to-end pipeline, detector design (raw vs normalised threshold) dominates; sketch choice does not measurably affect F1.
+**Under hash rotation (different seed each epoch):** the bias no longer cancels, and sketch type becomes the dominant factor. A controlled experiment (Stage 4 hash-rotation experiment section) sweeps 10 seed pairs (s, s+1) for s=0..9 using w=64, d=3, 200 Zipf flows, N=5000, and *identical data in both epochs* so all residual L1 is pure sketch bias — no sampling variance. Results (mean ± std across 10 pairs):
 
-**Do not claim**: one sketch is clearly best end-to-end, or that CMS/CU-CMS/CS differ strongly for temporal differencing under current settings.
+| Sketch | flow "1" mean ± std | flow "10" mean ± std | Interpretation |
+|--------|---------------------|----------------------|----------------|
+| CMS    | 3.5 ± 7.3           | 1.5 ± 1.2            | Unpredictable: sometimes 0, occasionally spikes to 25 |
+| CU-CMS | **0.0 ± 0.0**       | **0.0 ± 0.0**        | Exactly zero for all 10 pairs, both flows |
+| CS     | 4.0 ± 2.8           | 3.8 ± 1.8            | Consistently nonzero; tighter variance than CMS on the heavy flow, worse on the light flow |
 
-To expose meaningful sketch differences in later stages, reduce width (e.g. w=64), increase the number of flows, or increase bin count at fixed memory budget.
+**Why CU-CMS is zero:** with D=3 rows and W=64 and Zipf background, there is almost always at least one row with no heavy collision partner for a given bin. The min-over-rows picks that clean row and recovers the exact true count regardless of hash seed. CMS cannot do this: its overcount is strictly additive, so changing the collision partner changes the magnitude by a variable amount. CS has no systematic bias but the different sign functions across seeds produce non-cancelling per-realisation variance.
+
+**Why CMS std > mean for flow "1":** most seed pairs produce 0 or near-0 residual (collision partners happen to give similar overcounts), but a few pairs spike to 25. This makes CMS the *least predictable* sketch under hash rotation — you cannot know in advance which pairs are "bad".
+
+**Practical implication:** if hash seeds are fixed across epochs (the DHS pipeline default), all three sketches are equivalent for detection. If hash rotation is ever required (e.g., adversarial resilience, sketch rebuild after restart), CU-CMS is the clear choice — it achieves exactly zero residual in all tested configurations. CMS is the worst (high-variance spikes raise the noise floor unpredictably). CS sits between the two.
+
+**Safe claim**: sketch differences are clearest in single-epoch estimation (Stage 2) and under hash rotation (Stage 4 experiment). Under same-seed normal operation, detector design dominates and sketch choice has no measurable effect on F1.
+
+**Do not claim**: one sketch is best under all conditions, or that the CU-CMS=0 result generalises to much smaller widths or much heavier sketches without re-running the sweep.
+
+The `BaseSketch` constructor accepts an optional `uint32_t seed` parameter (default=0, preserving all existing behaviour). This is the knob used in the hash-rotation experiment and is available for any future cross-seed study.
 
 ---
 

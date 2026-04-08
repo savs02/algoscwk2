@@ -41,6 +41,13 @@ inline const char* change_type_name(ChangeType t) {
 }
 
 // ---------------------------------------------------------------------------
+// NOTE on noise_floor: this parameter controls two things only —
+//   (1) the None gate: total_abs < 3 * noise_floor * B
+//   (2) the per-bin sign threshold: d > noise_floor / d < -noise_floor
+// The internal shape-classification ratio constants (0.45 for VolumeChange
+// spikiness, 0.70/0.35 for Spike, B/4 tail for Spread) are fixed and are
+// calibrated for noise_floor = 5.0.  Passing a different noise_floor value
+// will shift gates (1) and (2) but will NOT automatically rescale these ratios.
 
 inline ChangeType classify_change(const std::vector<double>& diff,
                                   double noise_floor = 5.0)

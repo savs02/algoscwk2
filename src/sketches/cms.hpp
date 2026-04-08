@@ -19,8 +19,8 @@ class CountMinSketch : public BaseSketch {
     std::vector<std::vector<std::vector<int32_t>>> counters_;
 
 public:
-    CountMinSketch(int w, int d, const BinConfig& bin_cfg)
-        : BaseSketch(w, d, bin_cfg),
+    CountMinSketch(int w, int d, const BinConfig& bin_cfg, uint32_t seed = 0)
+        : BaseSketch(w, d, bin_cfg, seed),
           counters_(d,
               std::vector<std::vector<int32_t>>(
                   w, std::vector<int32_t>(bin_cfg.num_bins(), 0)))

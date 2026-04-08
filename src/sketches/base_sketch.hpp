@@ -28,22 +28,26 @@
 
 class BaseSketch {
 protected:
-    int      w_, d_;
+    int       w_, d_;
     BinConfig bin_cfg_;
+    uint32_t  seed_;   // per-sketch hash seed; default 0 preserves original behaviour
 
+    // seed_ + row gives the MurmurHash seed for row j's position hash.
+    // seed_ + row + 1,000,000 gives the seed for the sign hash (offset keeps the
+    // two families independent since D << 1,000,000 in all practical settings).
     uint32_t hash_pos(const std::string& key, int row) const {
-        return mmh3::hash32(key, static_cast<uint32_t>(row))
+        return mmh3::hash32(key, seed_ + static_cast<uint32_t>(row))
                % static_cast<uint32_t>(w_);
     }
 
     int hash_sign(const std::string& key, int row) const {
-        uint32_t h = mmh3::hash32(key, static_cast<uint32_t>(row + 1'000'000));
+        uint32_t h = mmh3::hash32(key, seed_ + static_cast<uint32_t>(row + 1'000'000));
         return (h & 1u) == 0 ? 1 : -1;
     }
 
 public:
-    BaseSketch(int w, int d, const BinConfig& bin_cfg)
-        : w_(w), d_(d), bin_cfg_(bin_cfg) {}
+    BaseSketch(int w, int d, const BinConfig& bin_cfg, uint32_t seed = 0)
+        : w_(w), d_(d), bin_cfg_(bin_cfg), seed_(seed) {}
 
     virtual ~BaseSketch() = default;
 
