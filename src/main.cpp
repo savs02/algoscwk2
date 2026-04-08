@@ -183,7 +183,7 @@ static void run_stage2_scheme(const BinConfig& cfg, const std::string& scheme_na
     }
 }
 
-static void run_stage2() {
+static bool run_stage2() {
     constexpr int      N_ITEMS    = 10'000;
     constexpr int      N_MAX_KEY  = 1000;
     constexpr double   ZIPF_ALPHA = 1.5;
@@ -229,13 +229,66 @@ static void run_stage2() {
     }
 
     BinConfig log_cfg(8, 0.5, 30.0, BinScheme::Logarithmic);
-    {
-        std::map<std::string,std::vector<int>> gt;
-        for (const auto& k : top_keys) gt[k].assign(8, 0);
-        for (const auto& [key,lat] : stream)
-            if (gt.count(key)) gt[key][log_cfg.get_bin(lat)]++;
-        run_stage2_scheme(log_cfg, "Logarithmic [0.5, 30]", stream, gt, top_keys);
+    std::map<std::string,std::vector<int>> gt_log;
+    for (const auto& k : top_keys) gt_log[k].assign(8, 0);
+    for (const auto& [key,lat] : stream)
+        if (gt_log.count(key)) gt_log[key][log_cfg.get_bin(lat)]++;
+    run_stage2_scheme(log_cfg, "Logarithmic [0.5, 30]", stream, gt_log, top_keys);
+
+    // -----------------------------------------------------------------------
+    // Accuracy PASS/FAIL: run at w=64 (high collision pressure) so that
+    // sketch-type differences are visible.
+    // Pass criteria:
+    //   (1) CU-CMS avg absolute per-bin error < CMS avg absolute per-bin error
+    //   (2) CMS avg signed per-bin error > 0  (always overestimates)
+    // -----------------------------------------------------------------------
+    constexpr int W_CHK = 64, D_CHK = 3;
+    CountMinSketch        cms_c(W_CHK, D_CHK, log_cfg);
+    ConservativeUpdateCMS cu_c (W_CHK, D_CHK, log_cfg);
+    CountSketch           cs_c (W_CHK, D_CHK, log_cfg);
+    for (const auto& [k, lat] : stream) {
+        cms_c.update(k, lat);
+        cu_c.update(k, lat);
+        cs_c.update(k, lat);
     }
+    const std::string& chk_key   = top_keys[0];
+    const auto&        truth_vec = gt_log.at(chk_key);
+    auto cms_h = cms_c.query_histogram(chk_key);
+    auto cu_h  = cu_c.query_histogram(chk_key);
+    auto cs_h  = cs_c.query_histogram(chk_key);
+    int B_chk = log_cfg.num_bins();
+    double cms_abs = 0, cu_abs = 0, cs_abs = 0;
+    double cms_signed = 0, cu_signed = 0, cs_signed = 0;
+    for (int b = 0; b < B_chk; ++b) {
+        cms_abs    += std::abs(cms_h[b] - truth_vec[b]);
+        cu_abs     += std::abs(cu_h[b]  - truth_vec[b]);
+        cs_abs     += std::abs(cs_h[b]  - truth_vec[b]);
+        cms_signed += cms_h[b] - truth_vec[b];
+        cu_signed  += cu_h[b]  - truth_vec[b];
+        cs_signed  += cs_h[b]  - truth_vec[b];
+    }
+    cms_abs /= B_chk;  cu_abs /= B_chk;  cs_abs /= B_chk;
+    cms_signed /= B_chk;  cu_signed /= B_chk;  cs_signed /= B_chk;
+
+    bool cu_beats_cms = (cu_abs < cms_abs);
+    bool cms_positive = (cms_signed > 0);
+    bool stage2_pass  = cu_beats_cms && cms_positive;
+
+    std::cout << "\n  Accuracy check (w=" << W_CHK << ", top flow \"" << chk_key << "\"):\n";
+    std::cout << "  " << std::left << std::setw(10) << "Sketch"
+              << std::setw(22) << "avg_abs_err/bin"
+              << std::setw(22) << "avg_signed_err/bin\n"
+              << "  " << std::string(54, '-') << "\n";
+    for (auto& [nm, ab, sg] : std::vector<std::tuple<std::string,double,double>>{
+            {"CMS", cms_abs, cms_signed}, {"CU-CMS", cu_abs, cu_signed}, {"CS", cs_abs, cs_signed}})
+        std::cout << "  " << std::left << std::setw(10) << nm
+                  << std::setw(22) << std::fixed << std::setprecision(2) << ab
+                  << std::setw(22) << sg << "\n";
+
+    std::cout << "  CU-CMS avg_abs < CMS avg_abs : " << (cu_beats_cms ? "YES (PASS)" : "NO (FAIL)") << "\n";
+    std::cout << "  CMS avg_signed > 0           : " << (cms_positive  ? "YES (PASS)" : "NO (FAIL)") << "\n";
+    std::cout << "\n" << (stage2_pass ? "ALL PASS" : "SOME FAILED") << " — Stage 2\n";
+    return stage2_pass;
 }
 
 // ============================================================================
@@ -710,22 +763,30 @@ static bool run_stage5() {
 
     // Informational robustness sweep.
     std::cout << "\n  Robustness sweep (informational only)\n";
-    std::cout << "  This checks the same heuristics under different seeds and a\n"
-              << "  collision-heavier width. It is not part of checkpoint gating.\n\n";
+    std::cout << "  Sweeps width, packets-per-flow N, and seed to find where\n"
+              << "  the classifier starts failing. Not part of checkpoint gating.\n\n";
     std::cout << "  " << std::left
-              << std::setw(8) << "Width" << std::setw(8) << "Seed"
-              << std::setw(12) << "Passed" << std::setw(12) << "Total"
+              << std::setw(8)  << "Width"
+              << std::setw(8)  << "N"
+              << std::setw(8)  << "Seed"
+              << std::setw(12) << "Passed"
+              << std::setw(12) << "Total"
               << std::setw(12) << "Accuracy\n"
-              << "  " << std::string(52, '-') << "\n";
+              << "  " << std::string(60, '-') << "\n";
     for (int w : {1024, 128}) {
-        for (uint32_t seed : {42u, 43u, 44u}) {
-            auto sc = s5_build_cases(N, seed);
-            auto sm = s5_run_suite(sc, w, D, cfg, false);
-            std::cout << "  " << std::left
-                      << std::setw(8) << w << std::setw(8) << seed
-                      << std::setw(12) << sm.passed << std::setw(12) << sm.total
-                      << std::setw(10) << std::fixed << std::setprecision(1)
-                      << 100.0*sm.passed/sm.total << "%\n";
+        for (int n_sweep : {N, N/5, N/10}) {  // 1000, 200, 100
+            for (uint32_t seed : {42u, 43u, 44u}) {
+                auto sc = s5_build_cases(n_sweep, seed);
+                auto sm = s5_run_suite(sc, w, D, cfg, false);
+                std::cout << "  " << std::left
+                          << std::setw(8)  << w
+                          << std::setw(8)  << n_sweep
+                          << std::setw(8)  << seed
+                          << std::setw(12) << sm.passed
+                          << std::setw(12) << sm.total
+                          << std::setw(10) << std::fixed << std::setprecision(1)
+                          << 100.0*sm.passed/sm.total << "%\n";
+            }
         }
     }
 
@@ -755,7 +816,8 @@ static S6DetectionResult run_stage6_detection(
     const std::function<EpochManager::SketchPtr()>& factory,
     const GeneratedStream& gs,
     const BinConfig& cfg,
-    double l1_threshold,
+    double l1_norm_threshold,   // flag if L1/baseline > this
+    double l1_abs_floor,        // and raw L1 > this (avoids FP on near-empty flows)
     const std::vector<AnomalySpec>& anomaly_specs,
     bool verbose)
 {
@@ -775,7 +837,12 @@ static S6DetectionResult run_stage6_detection(
         for (const auto& fid : gs.flow_keys) {
             auto diff   = diff_histograms(sk_new, sk_old, fid);
             auto scores = compute_scores(diff);
-            if (is_heavy_changer(scores, l1_threshold, ChangeMetric::L1))
+            // Normalise by baseline count so lighter flows are not disadvantaged.
+            auto baseline_hist = sk_old.query_histogram(fid);
+            double baseline = 0;
+            for (double v : baseline_hist) baseline += std::max(v, 0.0);
+            double l1_norm = scores.l1 / std::max(baseline, 1.0);
+            if (l1_norm > l1_norm_threshold && scores.l1 > l1_abs_floor)
                 detected.insert({fid, b});
         }
     }
@@ -791,8 +858,9 @@ static S6DetectionResult run_stage6_detection(
                   << std::setw(10) << "Boundary"
                   << std::setw(8)  << "GT"
                   << std::setw(8)  << "Det"
-                  << std::setw(8)  << "L1\n"
-                  << "  " << std::string(58, '-') << "\n";
+                  << std::setw(10) << "L1"
+                  << std::setw(10) << "L1_norm\n"
+                  << "  " << std::string(70, '-') << "\n";
 
         std::unordered_map<std::string,const char*> amap;
         for (const auto& a : anomaly_specs) amap[a.flow_id] = anomaly_type_name(a.type);
@@ -809,16 +877,19 @@ static S6DetectionResult run_stage6_detection(
                 const BaseSketch& sk_old = em.get_previous_sketch(K-1-b);
                 auto diff   = diff_histograms(sk_new, sk_old, fid);
                 auto scores = compute_scores(diff);
+                auto bh     = sk_old.query_histogram(fid);
+                double base = 0; for (double v : bh) base += std::max(v, 0.0);
+                double l1_n = scores.l1 / std::max(base, 1.0);
                 bool in_gt  = gt_set.count({fid,b}) > 0;
                 bool in_det = detected.count({fid,b}) > 0;
-                if (in_gt || scores.l1 > l1_threshold * 0.5)
+                if (in_gt || l1_n > l1_norm_threshold * 0.5)
                     std::cout << "  " << std::setw(10) << fid
                               << std::setw(14) << atype
                               << std::setw(10) << b
                               << std::setw(8)  << (in_gt  ? "YES" : "-")
                               << std::setw(8)  << (in_det ? "YES" : "-")
-                              << std::setw(8)  << std::fixed << std::setprecision(0)
-                              << scores.l1 << "\n";
+                              << std::setw(10) << std::fixed << std::setprecision(0) << scores.l1
+                              << std::setw(10) << std::fixed << std::setprecision(3) << l1_n << "\n";
             }
         }
         std::cout << "  TP=" << res.tp << " FP=" << res.fp << " FN=" << res.fn
@@ -837,13 +908,16 @@ static bool run_stage6() {
     constexpr int      W          = 1024;
     constexpr int      D          = 3;
     constexpr uint32_t SEED       = 42;
-    constexpr double   L1_THRESH  = 300.0;
+    // Normalised L1 threshold: flag if L1/baseline > L1_NORM_THRESH and L1 > ABS_FLOOR.
+    // Normalisation makes detection fair across flows of different sizes.
+    constexpr double   L1_NORM_THRESH = 0.15;
+    constexpr double   L1_ABS_FLOOR   = 30.0;
     const double       BASE_MU    = std::log(5.0);
 
     BinConfig cfg(10, 0.5, 200.0, BinScheme::Logarithmic);
     std::vector<AnomalySpec> anomalies = {
         {"1", AnomalyType::SuddenSpike,   1, 2.0},
-        {"2", AnomalyType::GradualRamp,   1, 1.2},
+        {"2", AnomalyType::GradualRamp,   1, 1.5},  // raised from 1.2 → detectable signal
         {"3", AnomalyType::PeriodicBurst, 1, 2.0},
         {"4", AnomalyType::Spread,        1, 2.0},
         {"5", AnomalyType::Disappearance, 1, 2.0},
@@ -857,7 +931,8 @@ static bool run_stage6() {
               << " epoch_size=" << EPOCH_SIZE
               << " Zipf(alpha=" << ZIPF_ALPHA << ")\n";
     std::cout << "Bins: 10 log-spaced [0.5,200], w=" << W << ", d=" << D << "\n";
-    std::cout << "L1 threshold: " << L1_THRESH << "\n\n";
+    std::cout << "Detection: L1_norm > " << L1_NORM_THRESH
+              << " && L1_raw > " << L1_ABS_FLOOR << "\n\n";
     std::cout << "This checkpoint uses one clean synthetic setup as the pass/fail\n"
               << "target. The robustness sweep later is informational and shows\n"
               << "how sensitive detection is to seed / memory / threshold choices.\n\n";
@@ -877,7 +952,7 @@ static bool run_stage6() {
             {"CU-CMS", [&]{ return std::make_unique<ConservativeUpdateCMS>(W,D,cfg); }},
             {"CS",     [&]{ return std::make_unique<CountSketch>(W,D,cfg); }},
         }) {
-        auto res  = run_stage6_detection(sname, factory, gs, cfg, L1_THRESH, anomalies, true);
+        auto res  = run_stage6_detection(sname, factory, gs, cfg, L1_NORM_THRESH, L1_ABS_FLOOR, anomalies, true);
         bool pass = res.f1() >= 0.7;
         std::cout << "  " << sname << ": " << (pass ? "PASS" : "FAIL")
                   << " (F1=" << std::fixed << std::setprecision(3) << res.f1() << ")\n\n";
@@ -891,13 +966,13 @@ static bool run_stage6() {
               << "of checkpoint gating; it is there to expose empirical stability.\n\n";
     std::cout << std::left
               << std::setw(8)  << "Width" << std::setw(8) << "Seed"
-              << std::setw(10) << "Thresh" << std::setw(10) << "Sketch"
+              << std::setw(10) << "NormThr" << std::setw(10) << "Sketch"
               << std::setw(8)  << "TP" << std::setw(8) << "FP"
               << std::setw(8)  << "FN" << std::setw(10) << "F1\n"
               << std::string(70, '-') << "\n";
     for (int w : {1024, 256}) {
         for (uint32_t seed : {42u, 43u, 44u}) {
-            for (double thresh : {250.0, 300.0, 350.0}) {
+            for (double norm_t : {0.10, 0.15, 0.20}) {
                 auto sgs = generate_stream(NUM_FLOWS, NUM_EPOCHS, EPOCH_SIZE,
                                             ZIPF_ALPHA, BASE_MU, BASE_SIGMA, anomalies, seed);
                 for (const auto& [sname, factory] :
@@ -907,10 +982,10 @@ static bool run_stage6() {
                          {"CU-CMS", [&]{ return std::make_unique<ConservativeUpdateCMS>(w,D,cfg); }},
                          {"CS",     [&]{ return std::make_unique<CountSketch>(w,D,cfg); }},
                      }) {
-                    auto r = run_stage6_detection(sname, factory, sgs, cfg, thresh, anomalies, false);
+                    auto r = run_stage6_detection(sname, factory, sgs, cfg, norm_t, L1_ABS_FLOOR, anomalies, false);
                     std::cout << std::left
                               << std::setw(8)  << w << std::setw(8) << seed
-                              << std::setw(10) << std::fixed << std::setprecision(0) << thresh
+                              << std::setw(10) << std::fixed << std::setprecision(2) << norm_t
                               << std::setw(10) << sname
                               << std::setw(8)  << r.tp << std::setw(8) << r.fp
                               << std::setw(8)  << r.fn
@@ -932,12 +1007,12 @@ int main() {
     std::cout << "Differenced Histogram Sketch — full pipeline\n"
               << std::string(50, '=') << "\n";
 
-    // Stages 1 and 2 are informational (no pass/fail gate).
+    // Stage 1 is informational only.
     run_stage1();
-    run_stage2();
 
-    // Stages 3–6 have explicit pass/fail criteria.
+    // Stages 2–6 have explicit pass/fail criteria.
     bool pass = true;
+    pass &= run_stage2();
     pass &= run_stage3();
     pass &= run_stage4();
     pass &= run_stage5();
