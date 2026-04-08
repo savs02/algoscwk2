@@ -124,6 +124,10 @@ static void run_stage1() {
                   << std::setw(15) << max_abs(err) << "\n";
     }
     std::cout << "Expected: CMS > 0, CU-CMS > 0 but smaller, CS ≈ 0\n";
+    std::cout << "Note: sketch differences are clearest in single-epoch estimation\n"
+              << "(Stage 2, w=64). In diff-based detection (Stages 4-6) bias cancels\n"
+              << "across epochs, so the three sketch types tend to produce identical\n"
+              << "F1 scores under the current settings. Detector design dominates.\n";
 }
 
 // ============================================================================
@@ -751,10 +755,10 @@ static bool run_stage5() {
     std::cout << "\n=== Stage 5: Change type classification ===\n";
     std::cout << "w=" << W << ", d=" << D << ", N=" << N
               << ", bins=10 log-spaced [0.5, 200]\n";
-    std::cout << "Each case checks changed flow X and stable background flow Y.\n\n";
-    std::cout << "These labels are heuristic: the clean cases below are the\n"
-              << "checkpoint pass/fail target, and the robustness sweep after\n"
-              << "that is informational rather than a formal guarantee.\n\n";
+    std::cout << "Each case checks changed flow X and stable background flow Y.\n";
+    std::cout << "The classifier is rule-based heuristic: it matches the diff histogram\n"
+              << "shape against five empirical patterns. It is validated on synthetic cases\n"
+              << "below and does not carry formal guarantees outside that regime.\n\n";
 
     auto cases = s5_build_cases(N, SEED);
     auto clean = s5_run_suite(cases, W, D, cfg, true);
@@ -811,13 +815,18 @@ struct S6DetectionResult {
     }
 };
 
+// Detection mode: RawL1 uses a single absolute threshold; NormalisedL1 normalises
+// by the baseline count of each flow so lighter flows are not disadvantaged.
+enum class S6DetectionMode { RawL1, NormalisedL1 };
+
 static S6DetectionResult run_stage6_detection(
     const std::string& sketch_name,
     const std::function<EpochManager::SketchPtr()>& factory,
     const GeneratedStream& gs,
     const BinConfig& cfg,
-    double l1_norm_threshold,   // flag if L1/baseline > this
-    double l1_abs_floor,        // and raw L1 > this (avoids FP on near-empty flows)
+    S6DetectionMode mode,
+    double threshold,    // raw L1 threshold (RawL1) or normalised threshold (NormalisedL1)
+    double abs_floor,    // ignored for RawL1; minimum raw L1 for NormalisedL1
     const std::vector<AnomalySpec>& anomaly_specs,
     bool verbose)
 {
@@ -837,13 +846,17 @@ static S6DetectionResult run_stage6_detection(
         for (const auto& fid : gs.flow_keys) {
             auto diff   = diff_histograms(sk_new, sk_old, fid);
             auto scores = compute_scores(diff);
-            // Normalise by baseline count so lighter flows are not disadvantaged.
-            auto baseline_hist = sk_old.query_histogram(fid);
-            double baseline = 0;
-            for (double v : baseline_hist) baseline += std::max(v, 0.0);
-            double l1_norm = scores.l1 / std::max(baseline, 1.0);
-            if (l1_norm > l1_norm_threshold && scores.l1 > l1_abs_floor)
-                detected.insert({fid, b});
+            bool flag = false;
+            if (mode == S6DetectionMode::RawL1) {
+                flag = (scores.l1 > threshold);
+            } else {
+                auto bh = sk_old.query_histogram(fid);
+                double base = 0;
+                for (double v : bh) base += std::max(v, 0.0);
+                flag = (scores.l1 / std::max(base, 1.0)) > threshold
+                    && scores.l1 > abs_floor;
+            }
+            if (flag) detected.insert({fid, b});
         }
     }
 
@@ -882,7 +895,7 @@ static S6DetectionResult run_stage6_detection(
                 double l1_n = scores.l1 / std::max(base, 1.0);
                 bool in_gt  = gt_set.count({fid,b}) > 0;
                 bool in_det = detected.count({fid,b}) > 0;
-                if (in_gt || l1_n > l1_norm_threshold * 0.5)
+                if (in_gt || l1_n > threshold * 0.5)
                     std::cout << "  " << std::setw(10) << fid
                               << std::setw(14) << atype
                               << std::setw(10) << b
@@ -908,16 +921,21 @@ static bool run_stage6() {
     constexpr int      W          = 1024;
     constexpr int      D          = 3;
     constexpr uint32_t SEED       = 42;
-    // Normalised L1 threshold: flag if L1/baseline > L1_NORM_THRESH and L1 > ABS_FLOOR.
-    // Normalisation makes detection fair across flows of different sizes.
-    constexpr double   L1_NORM_THRESH = 0.15;
-    constexpr double   L1_ABS_FLOOR   = 30.0;
-    const double       BASE_MU    = std::log(5.0);
+    // Baseline detector: raw L1 > 300 (original checkpoint threshold).
+    constexpr double   RAW_L1_THRESH  = 300.0;
+    // Improved detector: L1/baseline > 0.15 AND raw L1 > 30.
+    // Normalisation makes detection fair across flows of different packet counts.
+    constexpr double   NORM_THRESH    = 0.15;
+    constexpr double   ABS_FLOOR      = 30.0;
+    const double       BASE_MU        = std::log(5.0);
 
+    // Anomaly magnitudes are explicit — no silent defaults.
+    // GradualRamp kept at 1.2 (original checkpoint value) so anomaly difficulty
+    // is identical between baseline and improved runs.
     BinConfig cfg(10, 0.5, 200.0, BinScheme::Logarithmic);
     std::vector<AnomalySpec> anomalies = {
         {"1", AnomalyType::SuddenSpike,   1, 2.0},
-        {"2", AnomalyType::GradualRamp,   1, 1.5},  // raised from 1.2 → detectable signal
+        {"2", AnomalyType::GradualRamp,   1, 1.2},
         {"3", AnomalyType::PeriodicBurst, 1, 2.0},
         {"4", AnomalyType::Spread,        1, 2.0},
         {"5", AnomalyType::Disappearance, 1, 2.0},
@@ -930,69 +948,155 @@ static bool run_stage6() {
     std::cout << "Flows=" << NUM_FLOWS << " epochs=" << NUM_EPOCHS
               << " epoch_size=" << EPOCH_SIZE
               << " Zipf(alpha=" << ZIPF_ALPHA << ")\n";
-    std::cout << "Bins: 10 log-spaced [0.5,200], w=" << W << ", d=" << D << "\n";
-    std::cout << "Detection: L1_norm > " << L1_NORM_THRESH
-              << " && L1_raw > " << L1_ABS_FLOOR << "\n\n";
-    std::cout << "This checkpoint uses one clean synthetic setup as the pass/fail\n"
-              << "target. The robustness sweep later is informational and shows\n"
-              << "how sensitive detection is to seed / memory / threshold choices.\n\n";
+    std::cout << "Bins: 10 log-spaced [0.5,200], w=" << W << ", d=" << D << "\n\n";
+
     std::cout << "Injected anomalies:\n";
     for (const auto& a : anomalies)
         std::cout << "  Flow " << a.flow_id << ": " << anomaly_type_name(a.type)
-                  << " starting epoch " << a.start_epoch << "\n";
+                  << "  magnitude=" << a.magnitude
+                  << "  starting epoch " << a.start_epoch << "\n";
     std::cout << "\nGround truth (" << gs.ground_truth.size() << " entries):\n";
     for (const auto& g : gs.ground_truth)
         std::cout << "  flow=" << g.flow_id << " boundary=" << g.boundary << "\n";
 
-    std::cout << "\nDetection results:\n";
-    bool all_pass = true;
+    // -----------------------------------------------------------------------
+    // Run 1 — Baseline: raw L1 threshold (original checkpoint decision rule)
+    // -----------------------------------------------------------------------
+    std::cout << "\n--- Baseline detector (raw L1 > " << RAW_L1_THRESH << ") ---\n";
+    bool baseline_pass = true;
     for (const auto& [sname, factory] : std::vector<std::pair<std::string,
                                          std::function<EpochManager::SketchPtr()>>>{
             {"CMS",    [&]{ return std::make_unique<CountMinSketch>(W,D,cfg); }},
             {"CU-CMS", [&]{ return std::make_unique<ConservativeUpdateCMS>(W,D,cfg); }},
             {"CS",     [&]{ return std::make_unique<CountSketch>(W,D,cfg); }},
         }) {
-        auto res  = run_stage6_detection(sname, factory, gs, cfg, L1_NORM_THRESH, L1_ABS_FLOOR, anomalies, true);
+        auto res  = run_stage6_detection(sname, factory, gs, cfg,
+                        S6DetectionMode::RawL1, RAW_L1_THRESH, 0.0, anomalies, true);
         bool pass = res.f1() >= 0.7;
         std::cout << "  " << sname << ": " << (pass ? "PASS" : "FAIL")
                   << " (F1=" << std::fixed << std::setprecision(3) << res.f1() << ")\n\n";
-        all_pass &= pass;
+        baseline_pass &= pass;
     }
+    std::cout << (baseline_pass ? "Baseline: ALL PASS" : "Baseline: SOME FAILED") << "\n";
 
-    // Robustness sweep.
-    std::cout << "Robustness sweep (informational only)\n";
-    std::cout << "Each row reruns the full synthetic generator and detector for a\n"
-              << "different seed / width / threshold combination. This is not part\n"
-              << "of checkpoint gating; it is there to expose empirical stability.\n\n";
+    // -----------------------------------------------------------------------
+    // Run 2 — Improved: normalised L1 detector
+    // Only the decision rule changes; anomaly setup is identical to baseline.
+    // Normalised L1 = raw L1 / baseline_count avoids penalising lighter flows.
+    // Expected improvement: higher recall for Spread, Disappearance, GradualRamp.
+    // -----------------------------------------------------------------------
+    std::cout << "\n--- Improved detector (L1/baseline > " << NORM_THRESH
+              << " && L1_raw > " << ABS_FLOOR << ") ---\n";
+    std::cout << "Same anomaly setup as baseline; only the decision rule changes.\n";
+    bool improved_pass = true;
+    for (const auto& [sname, factory] : std::vector<std::pair<std::string,
+                                         std::function<EpochManager::SketchPtr()>>>{
+            {"CMS",    [&]{ return std::make_unique<CountMinSketch>(W,D,cfg); }},
+            {"CU-CMS", [&]{ return std::make_unique<ConservativeUpdateCMS>(W,D,cfg); }},
+            {"CS",     [&]{ return std::make_unique<CountSketch>(W,D,cfg); }},
+        }) {
+        auto res  = run_stage6_detection(sname, factory, gs, cfg,
+                        S6DetectionMode::NormalisedL1, NORM_THRESH, ABS_FLOOR, anomalies, true);
+        bool pass = res.f1() >= 0.7;
+        std::cout << "  " << sname << ": " << (pass ? "PASS" : "FAIL")
+                  << " (F1=" << std::fixed << std::setprecision(3) << res.f1() << ")\n\n";
+        improved_pass &= pass;
+    }
+    std::cout << (improved_pass ? "Improved: ALL PASS" : "Improved: SOME FAILED") << "\n";
+
+    // Gate on baseline passing (as the original checkpoint criterion).
+    // Improved is reported for comparison but does not gate the result.
+    bool all_pass = baseline_pass;
+
+    // -----------------------------------------------------------------------
+    // Ablation: isolate the contribution of each component of the improved
+    // detector on the same stream (seed=42, w=1024).
+    //   A — Raw L1 > 300          (baseline, no normalisation)
+    //   B — L1/baseline > 0.15    (normalisation only, no absolute floor)
+    //   C — L1/baseline > 0.15 && L1_raw > 30  (normalisation + floor = full improved)
+    // -----------------------------------------------------------------------
+    struct AblationVariant { std::string label; S6DetectionMode mode; double thr, floor; };
+    std::cout << "\n--- Ablation: detector component comparison (seed=42, w=1024) ---\n";
     std::cout << std::left
-              << std::setw(8)  << "Width" << std::setw(8) << "Seed"
-              << std::setw(10) << "NormThr" << std::setw(10) << "Sketch"
+              << std::setw(40) << "Variant" << std::setw(10) << "Sketch"
               << std::setw(8)  << "TP" << std::setw(8) << "FP"
               << std::setw(8)  << "FN" << std::setw(10) << "F1\n"
-              << std::string(70, '-') << "\n";
-    for (int w : {1024, 256}) {
-        for (uint32_t seed : {42u, 43u, 44u}) {
-            for (double norm_t : {0.10, 0.15, 0.20}) {
-                auto sgs = generate_stream(NUM_FLOWS, NUM_EPOCHS, EPOCH_SIZE,
-                                            ZIPF_ALPHA, BASE_MU, BASE_SIGMA, anomalies, seed);
-                for (const auto& [sname, factory] :
-                     std::vector<std::pair<std::string,
-                                  std::function<EpochManager::SketchPtr()>>>{
-                         {"CMS",    [&]{ return std::make_unique<CountMinSketch>(w,D,cfg); }},
-                         {"CU-CMS", [&]{ return std::make_unique<ConservativeUpdateCMS>(w,D,cfg); }},
-                         {"CS",     [&]{ return std::make_unique<CountSketch>(w,D,cfg); }},
-                     }) {
-                    auto r = run_stage6_detection(sname, factory, sgs, cfg, norm_t, L1_ABS_FLOOR, anomalies, false);
-                    std::cout << std::left
-                              << std::setw(8)  << w << std::setw(8) << seed
-                              << std::setw(10) << std::fixed << std::setprecision(2) << norm_t
-                              << std::setw(10) << sname
-                              << std::setw(8)  << r.tp << std::setw(8) << r.fp
-                              << std::setw(8)  << r.fn
-                              << std::setw(10) << std::fixed << std::setprecision(3) << r.f1() << "\n";
-                }
+              << std::string(84, '-') << "\n";
+    for (const auto& v : std::vector<AblationVariant>{
+            {"A: raw L1 > 300",                        S6DetectionMode::RawL1,        300.0,  0.0},
+            {"B: L1/baseline > 0.15",                  S6DetectionMode::NormalisedL1, 0.15,   0.0},
+            {"C: L1/baseline > 0.15 && L1_raw > 30",   S6DetectionMode::NormalisedL1, 0.15,  30.0},
+        }) {
+        for (const auto& [sname, factory] :
+             std::vector<std::pair<std::string,
+                          std::function<EpochManager::SketchPtr()>>>{
+                 {"CMS",    [&]{ return std::make_unique<CountMinSketch>(W,D,cfg); }},
+                 {"CU-CMS", [&]{ return std::make_unique<ConservativeUpdateCMS>(W,D,cfg); }},
+                 {"CS",     [&]{ return std::make_unique<CountSketch>(W,D,cfg); }},
+             }) {
+            auto r = run_stage6_detection(sname, factory, gs, cfg,
+                         v.mode, v.thr, v.floor, anomalies, false);
+            std::cout << std::left
+                      << std::setw(40) << v.label << std::setw(10) << sname
+                      << std::setw(8)  << r.tp << std::setw(8) << r.fp
+                      << std::setw(8)  << r.fn
+                      << std::setw(10) << std::fixed << std::setprecision(3) << r.f1() << "\n";
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Threshold selection via validation/test split.
+    // Validation seeds: 42, 43 — used to pick normalised threshold.
+    // Test seed: 44 — held out, used only for final reporting.
+    // -----------------------------------------------------------------------
+    std::cout << "\n--- Threshold selection (validation seeds 42-43, test seed 44) ---\n";
+    std::cout << "Tuning normalised threshold on seeds 42-43 (avg F1 across 3 sketches):\n";
+
+    const std::vector<double> cand_thresholds = {0.10, 0.12, 0.15, 0.18, 0.20, 0.25};
+    double best_val_f1 = -1.0, best_thresh = NORM_THRESH;
+    for (double cand : cand_thresholds) {
+        double sum_f1 = 0.0;
+        int count = 0;
+        for (uint32_t val_seed : {42u, 43u}) {
+            auto vgs = generate_stream(NUM_FLOWS, NUM_EPOCHS, EPOCH_SIZE,
+                                        ZIPF_ALPHA, BASE_MU, BASE_SIGMA, anomalies, val_seed);
+            for (const auto& [sname, factory] :
+                 std::vector<std::pair<std::string,
+                              std::function<EpochManager::SketchPtr()>>>{
+                     {"CMS",    [&]{ return std::make_unique<CountMinSketch>(W,D,cfg); }},
+                     {"CU-CMS", [&]{ return std::make_unique<ConservativeUpdateCMS>(W,D,cfg); }},
+                     {"CS",     [&]{ return std::make_unique<CountSketch>(W,D,cfg); }},
+                 }) {
+                auto r = run_stage6_detection(sname, factory, vgs, cfg,
+                             S6DetectionMode::NormalisedL1, cand, ABS_FLOOR, anomalies, false);
+                sum_f1 += r.f1();
+                ++count;
             }
         }
+        double avg_f1 = sum_f1 / count;
+        std::cout << "  thresh=" << std::fixed << std::setprecision(2) << cand
+                  << "  val_avg_F1=" << std::fixed << std::setprecision(3) << avg_f1 << "\n";
+        if (avg_f1 > best_val_f1) { best_val_f1 = avg_f1; best_thresh = cand; }
+    }
+    std::cout << "Selected: thresh=" << std::fixed << std::setprecision(2) << best_thresh
+              << "  val_avg_F1=" << std::fixed << std::setprecision(3) << best_val_f1 << "\n";
+
+    // Final evaluation on held-out test seed 44.
+    std::cout << "\nTest result (held-out seed=44, thresh=" << best_thresh << "):\n";
+    auto test_gs = generate_stream(NUM_FLOWS, NUM_EPOCHS, EPOCH_SIZE,
+                                    ZIPF_ALPHA, BASE_MU, BASE_SIGMA, anomalies, 44u);
+    for (const auto& [sname, factory] :
+         std::vector<std::pair<std::string,
+                      std::function<EpochManager::SketchPtr()>>>{
+             {"CMS",    [&]{ return std::make_unique<CountMinSketch>(W,D,cfg); }},
+             {"CU-CMS", [&]{ return std::make_unique<ConservativeUpdateCMS>(W,D,cfg); }},
+             {"CS",     [&]{ return std::make_unique<CountSketch>(W,D,cfg); }},
+         }) {
+        auto r = run_stage6_detection(sname, factory, test_gs, cfg,
+                     S6DetectionMode::NormalisedL1, best_thresh, ABS_FLOOR, anomalies, false);
+        std::cout << "  " << std::left << std::setw(8) << sname
+                  << " TP=" << r.tp << " FP=" << r.fp << " FN=" << r.fn
+                  << "  F1=" << std::fixed << std::setprecision(3) << r.f1() << "\n";
     }
 
     std::cout << "\n" << (all_pass ? "ALL PASS" : "SOME FAILED") << " — Stage 6\n";

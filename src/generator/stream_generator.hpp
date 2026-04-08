@@ -52,8 +52,12 @@ inline const char* anomaly_type_name(AnomalyType t) {
 struct AnomalySpec {
     std::string flow_id;
     AnomalyType type;
-    int         start_epoch;     // first epoch where anomaly is active
-    double      magnitude = 2.0; // multiplier applied to the mean shift/spread
+    int         start_epoch; // first epoch where anomaly is active
+    double      magnitude;   // multiplier; must be set explicitly — semantics differ per type
+                             // SuddenSpike/PeriodicBurst: mean * magnitude for anomaly epoch(s)
+                             // GradualRamp: mean * magnitude^steps per epoch
+                             // Spread: sigma * magnitude from start_epoch
+                             // Disappearance: unused (no packets)
 };
 
 struct GroundTruthEntry {

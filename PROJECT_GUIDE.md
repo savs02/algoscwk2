@@ -244,55 +244,112 @@ project/
 
 ---
 
-## Known Limitations and Improvements Applied
+## Design Decisions, Limitations, and Improvements
 
-The following issues were identified and addressed in `src/main.cpp`:
+### What `main.cpp` is
 
-### 1. Stage 2: Sketch accuracy check is now PASS/FAIL
+`src/main.cpp` is a **consolidated improved pipeline runner**. It is not a direct replacement for `checkpoint6.cpp`. The individual checkpoint files (`checkpoint1.cpp` through `checkpoint6.cpp`) remain the authoritative baseline implementations. `main.cpp` runs the same stages in one binary, then adds extra analysis where that is useful.
 
-**Problem**: The histogram accuracy table was purely informational — no check confirmed that CU-CMS actually outperforms CMS.
+---
 
-**Fix**: Run a PASS/FAIL accuracy check at `w=64` (high collision pressure) for the top flow. Pass criteria:
+### What improved after the baseline checkpoints
+
+The repository now goes beyond the minimum checkpoint implementations in a few places that make the results easier to justify:
+
+- **Stage 3** now supports timestamped `(timestamp, key, value)` streams and checks snapshot isolation more directly, instead of relying only on qualitative output.
+- **Stage 4** now treats histogram differencing as a metric-driven step (`L1`, `L2`, `max-bin`) rather than implicitly using only one score.
+- **Stage 5** now validates the classifier against both a changed flow and a stable background flow, so false positives are visible instead of hidden. It also includes a robustness sweep, which makes it clearer that the classifier is heuristic rather than formally guaranteed.
+- **Stage 6** now separates the clean checkpoint run from broader empirical analysis. That keeps the checkpoint result intact while still showing how detector behaviour changes under different thresholds, seeds, and signal strengths.
+- The anomaly generator API is also stricter now: `AnomalySpec.magnitude` must be set explicitly, which avoids silent defaults changing the experiment unintentionally.
+
+---
+
+### Stage 2: Sketch accuracy is now PASS/FAIL
+
+The original Stage 2 table was purely informational. A PASS/FAIL check was added that runs at `w=64` (high collision pressure) for the top flow. Pass criteria:
 - CU-CMS average absolute per-bin error < CMS average absolute per-bin error
-- CMS average signed per-bin error > 0 (confirms overestimation)
+- CMS average signed per-bin error > 0 (confirms overestimation bias)
 
-This directly verifies the intended accuracy ordering: CU-CMS ≤ CMS for absolute error, CMS always positive-biased.
-
----
-
-### 2. Stage 6: Replaced absolute L1 threshold with normalised L1
-
-**Problem**: A single absolute threshold (e.g. L1 > 300) disadvantages lighter flows. Flow 5 (Disappearance) only has ~186 packets, so its raw L1 never reaches 300 even when it completely disappears. Same for Spread on flow 4 (L1 ≈ 162).
-
-**Fix**: Compute `L1_norm = L1_raw / baseline_count` where `baseline_count` is the total count in the older epoch's histogram for that flow. Flag if `L1_norm > 0.15` AND `L1_raw > 30` (floor prevents false positives from empty flows). This improved F1 from 0.714 → 0.900 (TP=9/9, FP=2).
-
-**Note**: The 2 false positives are Spread flow 4 at boundaries 1 and 2, where sigma doubling persists. These are borderline cases: `L1_norm ≈ 0.21` which is above the threshold. Raising the threshold to 0.25 eliminates them but risks missing the Spread boundary 0 detection in some seeds.
+This directly verifies the expected accuracy ordering and is the clearest place in the pipeline where CMS, CU-CMS, and CS behave differently.
 
 ---
 
-### 3. Stage 6: GradualRamp magnitude raised from 1.2 to 1.5
+### Stage 5: Robustness sweep includes small-N cases
 
-**Problem**: With magnitude=1.2, each epoch-to-epoch step shifts the mean by only `log(1.2) ≈ 0.18` in log-space. The resulting L1 scores (270 and 190) were below the 300 absolute threshold and marginal even normalised.
+The original sweep only varied width and seed, and returned 100% accuracy at all settings (not informative). The sweep now also varies packets-per-flow `N ∈ {1000, 200, 100}`:
+- N=1000: 100% (clean baseline)
+- N=200: ~60% — classification starts failing at moderate packet counts
+- N=100: 20–40% — most heuristics fail under low-signal conditions
 
-**Fix**: Increased to 1.5 (each step shifts mean by `log(1.5) ≈ 0.41`). The GradualRamp signal is now reliably above the normalised threshold across seeds.
-
----
-
-### 4. Stage 5 robustness sweep now includes small-N cases
-
-**Problem**: The sweep only varied width and seed. With N=1000 packets per flow, even N=128 width achieved 100% accuracy — the sweep was uninformative.
-
-**Fix**: Sweep also over `N ∈ {1000, 200, 100}`. Results show accuracy degrades sharply below N=200:
-- N=1000: 100% across all widths and seeds
-- N=200: 60% — some change types fail with few packets
-- N=100: 20–40% — most classifiers fail under low-signal conditions
-
-This exposes the minimum viable packet count needed for reliable classification.
+The classifier should be described as **rule-based heuristic classification, empirically validated on synthetic patterns** — not as a principled or guaranteed method.
 
 ---
 
-### 5. Sketch type differentiation (fundamental limitation)
+### Stage 6: Baseline vs Improved detector (side-by-side)
 
-**Problem**: CMS, CU-CMS, and CS produce identical F1 scores in all stages. For diff-based detection, the hash functions are fixed across epochs, so any overcount bias in epoch A cancels exactly in epoch B. The three sketches only differ in single-epoch histogram accuracy, which Stage 2 now explicitly measures.
+`main.cpp` Stage 6 runs both detector variants against identical anomaly setups. GradualRamp stays at magnitude=1.2 (the original checkpoint value) so anomaly difficulty does not change between runs.
 
-**Status**: Addressed for Stage 2 (accuracy PASS/FAIL). For Stages 4–6, the three sketches remain identical because the test uses N=1000 packets at w=1024 with only 2 flows — negligible collision pressure. At lower widths or higher flow counts, CU-CMS would show a meaningful advantage in single-epoch queries.
+| Variant | Decision rule | F1 | TP/FP/FN |
+|---------|--------------|-----|----------|
+| Baseline | raw L1 > 300 | 0.714 | 5/0/4 |
+| Improved | L1/baseline > 0.15 && L1_raw > 30 | 0.900 | 9/2/0 |
+
+**Why the baseline misses 4 detections**: A single absolute threshold penalises lighter flows. Flow 5 (Disappearance) has ~186 packets so its raw L1 never crosses 300 even when the flow vanishes. Spread (L1 ≈ 162) and GradualRamp (L1 ≈ 270, 190) have the same problem.
+
+**Pass/fail gating**: `main.cpp` gates on the **baseline** passing (F1 ≥ 0.7), matching the original checkpoint criterion. The improved variant is reported for comparison only.
+
+**Why this is beyond Checkpoint 6**: the original checkpoint only asked for a single end-to-end detector run with detected changers vs ground truth and an F1 score. `main.cpp` keeps that baseline run, but then adds a second detector formulation, side-by-side comparison, ablation, threshold selection, and robustness reporting. So Stage 6 in `main.cpp` should be read as an **extension built on top of Checkpoint 6**, not as the literal checkpoint specification.
+
+---
+
+### Stage 6: Ablation
+
+Three detector conditions are compared on the same stream (seed=42, w=1024):
+
+| Condition | Rule | F1 | Notes |
+|-----------|------|----|-------|
+| A | raw L1 > 300 | 0.714 | Baseline; high precision, weak recall |
+| B | L1/baseline > 0.15 | 0.066 | 253 FP — normalisation without a floor is unusable |
+| C | L1/baseline > 0.15 && L1_raw > 30 | 0.900 | Full improved; floor is essential |
+
+The ablation shows that the absolute floor is load-bearing: normalisation alone flags near-empty flows with tiny fluctuations as anomalies.
+
+---
+
+### Stage 6: Threshold selection (validation/test split)
+
+Thresholds are tuned on validation seeds {42, 43} and reported on the held-out test seed {44}:
+
+- Candidate normalised thresholds: 0.10, 0.12, 0.15, 0.18, 0.20, 0.25
+- Best validation threshold: **0.25** (val avg F1 = 0.950 across 3 sketches × 2 seeds)
+- Test result (seed 44): **F1 = 0.941**, TP=8, FP=0, FN=1
+
+At threshold=0.25 the two Spread boundary 1/2 false positives (L1_norm ≈ 0.21) drop out, giving zero false positives on the test seed. The one missed detection is GradualRamp at boundary 2 on seed 44 (signal weaker at that draw).
+
+---
+
+### Sketch type differentiation
+
+CMS, CU-CMS, and CS produce identical F1 scores in Stages 4–6. This is expected: for diff-based detection, the hash functions are fixed across epochs so overcount bias cancels identically in both sketches being differenced. The three types differ only in single-epoch histogram accuracy, which Stage 2 (w=64 check) directly measures and gates on.
+
+**Safe claim**: sketch differences are clearest in single-epoch estimation (Stage 2). Under the current end-to-end pipeline, detector design (raw vs normalised threshold) dominates; sketch choice does not measurably affect F1.
+
+**Do not claim**: one sketch is clearly best end-to-end, or that CMS/CU-CMS/CS differ strongly for temporal differencing under current settings.
+
+To expose meaningful sketch differences in later stages, reduce width (e.g. w=64), increase the number of flows, or increase bin count at fixed memory budget.
+
+---
+
+### Stage 5 classifier
+
+The Stage 5 change-type classifier is **rule-based heuristic**: it matches diff histogram shapes against five empirical patterns (Disappearance, VolumeChange, Spike, Shift, Spread). It is validated on synthetic cases only and carries no formal guarantees outside that regime. Accuracy degrades to ~60% at N=200 packets per flow and ~20–40% at N=100.
+
+---
+
+### AnomalySpec API
+
+`AnomalySpec.magnitude` no longer has a default value. All callers must set it explicitly. The per-type semantics differ:
+- `SuddenSpike` / `PeriodicBurst`: anomaly-epoch mean is `exp(base_mu) * magnitude`
+- `GradualRamp`: mean is multiplied by `magnitude^steps` per epoch step after `start_epoch`
+- `Spread`: sigma is multiplied by `magnitude` from `start_epoch` onward
+- `Disappearance`: `magnitude` is unused
