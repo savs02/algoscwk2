@@ -221,11 +221,11 @@ int main() {
 
     // Five anomaly flows assigned to the top-5 Zipf flows (heaviest hitters).
     std::vector<AnomalySpec> anomalies = {
-        {"1", AnomalyType::SuddenSpike,   1},
-        {"2", AnomalyType::GradualRamp,   1},
-        {"3", AnomalyType::PeriodicBurst, 1},
-        {"4", AnomalyType::Spread,        1},
-        {"5", AnomalyType::Disappearance, 1},
+        {"1", AnomalyType::SuddenSpike,   1, 2.0},
+        {"2", AnomalyType::GradualRamp,   1, 1.2},
+        {"3", AnomalyType::PeriodicBurst, 1, 2.0},
+        {"4", AnomalyType::Spread,        1, 2.0},
+        {"5", AnomalyType::Disappearance, 1, 2.0},
     };
 
     auto gs = generate_stream(NUM_FLOWS, NUM_EPOCHS, EPOCH_SIZE,

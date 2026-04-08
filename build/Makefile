@@ -194,6 +194,19 @@ checkpoint6/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint6.dir/build.make CMakeFiles/checkpoint6.dir/build
 .PHONY : checkpoint6/fast
 
+#=============================================================================
+# Target rules for targets named main
+
+# Build rule for target.
+main: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 main
+.PHONY : main
+
+# fast build rule for target.
+main/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+.PHONY : main/fast
+
 src/checkpoint1.o: src/checkpoint1.cpp.o
 .PHONY : src/checkpoint1.o
 
@@ -338,6 +351,30 @@ src/checkpoint6.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint6.dir/build.make CMakeFiles/checkpoint6.dir/src/checkpoint6.cpp.s
 .PHONY : src/checkpoint6.cpp.s
 
+src/main.o: src/main.cpp.o
+.PHONY : src/main.o
+
+# target to build an object file
+src/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
+
+src/main.i: src/main.cpp.i
+.PHONY : src/main.i
+
+# target to preprocess a source file
+src/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
+
+src/main.s: src/main.cpp.s
+.PHONY : src/main.s
+
+# target to generate assembly for a file
+src/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -352,6 +389,7 @@ help:
 	@echo "... checkpoint4"
 	@echo "... checkpoint5"
 	@echo "... checkpoint6"
+	@echo "... main"
 	@echo "... src/checkpoint1.o"
 	@echo "... src/checkpoint1.i"
 	@echo "... src/checkpoint1.s"
@@ -370,6 +408,9 @@ help:
 	@echo "... src/checkpoint6.o"
 	@echo "... src/checkpoint6.i"
 	@echo "... src/checkpoint6.s"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 

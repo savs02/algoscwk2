@@ -52,7 +52,8 @@ inline const char* anomaly_type_name(AnomalyType t) {
 struct AnomalySpec {
     std::string flow_id;
     AnomalyType type;
-    int         start_epoch;  // first epoch where anomaly is active
+    int         start_epoch;     // first epoch where anomaly is active
+    double      magnitude = 2.0; // multiplier applied to the mean shift/spread
 };
 
 struct GroundTruthEntry {
@@ -85,27 +86,27 @@ flow_params_for_epoch(double base_mu, double base_sigma, int base_n,
 
     switch (anomaly->type) {
         case AnomalyType::SuddenSpike:
-            // Double the mean for exactly one epoch.
+            // Mean multiplied by magnitude for exactly one epoch.
             if (steps == 0)
-                return {base_mu + std::log(2.0), base_sigma, base_n};
+                return {base_mu + std::log(anomaly->magnitude), base_sigma, base_n};
             break;
 
         case AnomalyType::GradualRamp:
             // Mean multiplied by 1.2^steps.
             if (steps >= 0)
-                return {base_mu + steps * std::log(1.2), base_sigma, base_n};
+                return {base_mu + steps * std::log(anomaly->magnitude), base_sigma, base_n};
             break;
 
         case AnomalyType::PeriodicBurst:
             // Alternates: high at start_epoch, then normal, then high, ...
             if (steps >= 0 && (steps % 2 == 0))
-                return {base_mu + std::log(2.0), base_sigma, base_n};
+                return {base_mu + std::log(anomaly->magnitude), base_sigma, base_n};
             break;
 
         case AnomalyType::Spread:
             // Sigma doubles from start_epoch onward.
             if (steps >= 0)
-                return {base_mu, base_sigma * 2.0, base_n};
+                return {base_mu, base_sigma * anomaly->magnitude, base_n};
             break;
 
         case AnomalyType::Disappearance:
