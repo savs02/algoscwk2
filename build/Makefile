@@ -207,6 +207,19 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+#=============================================================================
+# Target rules for targets named evaluation
+
+# Build rule for target.
+evaluation: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 evaluation
+.PHONY : evaluation
+
+# fast build rule for target.
+evaluation/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/evaluation.dir/build.make CMakeFiles/evaluation.dir/build
+.PHONY : evaluation/fast
+
 src/checkpoint1.o: src/checkpoint1.cpp.o
 .PHONY : src/checkpoint1.o
 
@@ -351,6 +364,30 @@ src/checkpoint6.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/checkpoint6.dir/build.make CMakeFiles/checkpoint6.dir/src/checkpoint6.cpp.s
 .PHONY : src/checkpoint6.cpp.s
 
+src/evaluation.o: src/evaluation.cpp.o
+.PHONY : src/evaluation.o
+
+# target to build an object file
+src/evaluation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/evaluation.dir/build.make CMakeFiles/evaluation.dir/src/evaluation.cpp.o
+.PHONY : src/evaluation.cpp.o
+
+src/evaluation.i: src/evaluation.cpp.i
+.PHONY : src/evaluation.i
+
+# target to preprocess a source file
+src/evaluation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/evaluation.dir/build.make CMakeFiles/evaluation.dir/src/evaluation.cpp.i
+.PHONY : src/evaluation.cpp.i
+
+src/evaluation.s: src/evaluation.cpp.s
+.PHONY : src/evaluation.s
+
+# target to generate assembly for a file
+src/evaluation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/evaluation.dir/build.make CMakeFiles/evaluation.dir/src/evaluation.cpp.s
+.PHONY : src/evaluation.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -389,6 +426,7 @@ help:
 	@echo "... checkpoint4"
 	@echo "... checkpoint5"
 	@echo "... checkpoint6"
+	@echo "... evaluation"
 	@echo "... main"
 	@echo "... src/checkpoint1.o"
 	@echo "... src/checkpoint1.i"
@@ -408,6 +446,9 @@ help:
 	@echo "... src/checkpoint6.o"
 	@echo "... src/checkpoint6.i"
 	@echo "... src/checkpoint6.s"
+	@echo "... src/evaluation.o"
+	@echo "... src/evaluation.i"
+	@echo "... src/evaluation.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

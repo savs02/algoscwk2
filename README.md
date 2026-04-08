@@ -92,6 +92,20 @@ cmake --build build --target main
 ./build/main
 ```
 
+Report-facing evaluation sweeps:
+```bash
+cmake --build build --target evaluation
+./build/evaluation
+```
+
+This writes CSV outputs under `outputs/evaluation/` for the evaluation section
+tables and plots.
+
+Plot and summarise the evaluation outputs:
+```bash
+python3 analysis/plot_evaluation.py
+```
+
 Individual checkpoint binaries:
 ```bash
 cmake --build build --target checkpoint6

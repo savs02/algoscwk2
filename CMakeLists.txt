@@ -41,3 +41,7 @@ target_include_directories(checkpoint6 PRIVATE ${CMAKE_SOURCE_DIR}/src)
 # --- Main (consolidated) ---
 add_executable(main src/main.cpp)
 target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
+# --- Evaluation (report-facing sweeps) ---
+add_executable(evaluation src/evaluation.cpp)
+target_include_directories(evaluation PRIVATE ${CMAKE_SOURCE_DIR}/src)

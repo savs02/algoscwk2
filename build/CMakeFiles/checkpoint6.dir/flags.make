@@ -6,7 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/Users/savanisawaikar/algoscwk2/include -I/Users/savanisawaikar/algoscwk2/src
 
-CXX_FLAGSarm64 = -O2 -std=gnu++17 -arch arm64
-
-CXX_FLAGS = -O2 -std=gnu++17 -arch arm64
+CXX_FLAGS = -O2 -std=gnu++17
 

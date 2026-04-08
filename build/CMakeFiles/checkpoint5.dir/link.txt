@@ -1,1 +1,1 @@
-/usr/bin/c++ -O2 -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/checkpoint5.dir/src/checkpoint5.cpp.o -o checkpoint5
+/usr/bin/c++ -O2 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/checkpoint5.dir/src/checkpoint5.cpp.o -o checkpoint5
