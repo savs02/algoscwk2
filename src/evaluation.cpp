@@ -282,9 +282,9 @@ static void run_threshold_selection(const fs::path& out_dir,
                                     double& best_threshold,
                                     double& best_val_f1)
 {
-    constexpr int num_flows = 100;
+    constexpr int num_flows = 10000;
     constexpr int num_epochs = 4;
-    constexpr int epoch_size = 5000;
+    constexpr int epoch_size = 100000;
     constexpr int width = 1024;
     constexpr int depth = 3;
     constexpr int bins = 10;
@@ -363,9 +363,9 @@ static void run_bins_sweep(const fs::path& out_dir, const DetectorConfig& detect
     constexpr int base_bins = 10;
     constexpr int snapshots = 4;
     constexpr int base_snapshots = 4;
-    constexpr int num_flows = 100;
+    constexpr int num_flows = 10000;
     constexpr int num_epochs = 4;
-    constexpr int epoch_size = 5000;
+    constexpr int epoch_size = 100000;
     constexpr double zipf_alpha = 1.5;
     std::vector<uint32_t> seeds = {42, 43, 44};
 
@@ -395,8 +395,8 @@ static void run_snapshots_sweep(const fs::path& out_dir, const DetectorConfig& d
     constexpr int bins = 10;
     constexpr int base_bins = 10;
     constexpr int base_snapshots = 4;
-    constexpr int num_flows = 100;
-    constexpr int epoch_size = 5000;
+    constexpr int num_flows = 10000;
+    constexpr int epoch_size = 100000;
     constexpr double zipf_alpha = 1.5;
     constexpr int num_epochs = 4;
     std::vector<uint32_t> seeds = {42, 43, 44};
@@ -504,8 +504,8 @@ static void run_hash_rotation_experiment(const fs::path& out_dir) {
     constexpr int width = 64;
     constexpr int depth = 3;
     constexpr int bins = 10;
-    constexpr int num_flows = 200;
-    constexpr int n_items = 20000;
+    constexpr int num_flows = 10000;
+    constexpr int n_items = 100000;
     constexpr double zipf_alpha = 1.5;
     const double mu = std::log(5.0);
     constexpr double sigma = 0.5;
