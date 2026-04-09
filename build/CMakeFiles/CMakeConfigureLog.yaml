@@ -4,14 +4,14 @@ events:
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_UNAME"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: true
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -20,89 +20,66 @@ events:
     names:
       - "uname"
     candidate_directories:
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
       - "/usr/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
       - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
     searched_directories:
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/uname"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/uname"
-      - "/opt/homebrew/bin/uname"
-      - "/opt/homebrew/sbin/uname"
+      - "/home/sara/.local/bin/uname"
+      - "/home/sara/Applications/uname"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/uname"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/uname"
+      - "/home/sara/.cargo/bin/uname"
+      - "/usr/local/sbin/uname"
       - "/usr/local/bin/uname"
-      - "/System/Cryptexes/App/usr/bin/uname"
     found: "/usr/bin/uname"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "message-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:212 (message)"
       - "CMakeLists.txt:2 (project)"
     message: |
-      The system is: Darwin - 25.3.0 - arm64
+      The system is: Linux - 6.19.9-arch1-1 - x86_64
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeUnixFindMake.cmake:5 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeUnixFindMake.cmake:5 (find_program)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_MAKE_PROGRAM"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: true
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -113,108 +90,71 @@ events:
       - "make"
       - "smake"
     candidate_directories:
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
       - "/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     searched_directories:
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/gmake"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/gmake"
-      - "/opt/homebrew/bin/gmake"
-      - "/opt/homebrew/sbin/gmake"
+      - "/home/sara/.local/bin/gmake"
+      - "/home/sara/Applications/gmake"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gmake"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gmake"
+      - "/home/sara/.cargo/bin/gmake"
+      - "/usr/local/sbin/gmake"
       - "/usr/local/bin/gmake"
-      - "/System/Cryptexes/App/usr/bin/gmake"
       - "/usr/bin/gmake"
-      - "/bin/gmake"
-      - "/usr/sbin/gmake"
-      - "/sbin/gmake"
-      - "/usr/local/apache-maven-3.9.1/bin/gmake"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/gmake"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/gmake"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/gmake"
-      - "/opt/pmk/env/global/bin/gmake"
-      - "/Library/Apple/usr/bin/gmake"
-      - "/usr/local/share/dotnet/gmake"
-      - "/Users/savanisawaikar/.dotnet/tools/gmake"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/gmake"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/gmake"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/gmake"
-      - "/Users/savanisawaikar/.cargo/bin/gmake"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/gmake"
-      - "/Users/savanisawaikar/.local/bin/gmake"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/gmake"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/make"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/make"
-      - "/opt/homebrew/bin/make"
-      - "/opt/homebrew/sbin/make"
+      - "/usr/bin/site_perl/gmake"
+      - "/usr/bin/vendor_perl/gmake"
+      - "/usr/bin/core_perl/gmake"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/gmake"
+      - "/home/sara/.local/bin/make"
+      - "/home/sara/Applications/make"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/make"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/make"
+      - "/home/sara/.cargo/bin/make"
+      - "/usr/local/sbin/make"
       - "/usr/local/bin/make"
-      - "/System/Cryptexes/App/usr/bin/make"
     found: "/usr/bin/make"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompiler.cmake:73 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:69 (_cmake_find_compiler)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompiler.cmake:73 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:69 (_cmake_find_compiler)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_CXX_COMPILER"
     description: "CXX compiler"
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: true
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -222,93 +162,72 @@ events:
       CMAKE_FIND_USE_INSTALL_PREFIX: true
     names:
       - "c++"
+      - "CC"
       - "g++"
+      - "aCC"
       - "cl"
       - "bcc"
+      - "xlC"
       - "icpx"
       - "icx"
       - "clang++"
     candidate_directories:
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
       - "/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     searched_directories:
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/c++"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/c++"
-      - "/opt/homebrew/bin/c++"
-      - "/opt/homebrew/sbin/c++"
+      - "/home/sara/.local/bin/c++"
+      - "/home/sara/Applications/c++"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/c++"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/c++"
+      - "/home/sara/.cargo/bin/c++"
+      - "/usr/local/sbin/c++"
       - "/usr/local/bin/c++"
-      - "/System/Cryptexes/App/usr/bin/c++"
     found: "/usr/bin/c++"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:468 (find_file)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:506 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
       - "CMakeLists.txt:2 (project)"
     mode: "file"
     variable: "src_in"
     description: "Path to a file."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: true
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -317,46 +236,34 @@ events:
     names:
       - "CMakeCXXCompilerId.cpp.in"
     candidate_directories:
-      - "/opt/homebrew/share/cmake/Modules/"
-    found: "/opt/homebrew/share/cmake/Modules/CMakeCXXCompilerId.cpp.in"
+      - "/usr/share/cmake/Modules/"
+    found: "/usr/share/cmake/Modules/CMakeCXXCompilerId.cpp.in"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "message-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
       - "CMakeLists.txt:2 (project)"
     message: |
       Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
@@ -370,62 +277,21 @@ events:
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
       
-      The CXX compiler identification is AppleClang, found in:
-        /Users/savanisawaikar/algoscwk2/build/CMakeFiles/4.1.2/CompilerIdCXX/a.out
+      The CXX compiler identification is GNU, found in:
+        /home/sara/algoscwk2/build/CMakeFiles/4.3.1/CompilerIdCXX/a.out
       
-  -
-    kind: "message-v1"
-    backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:290 (message)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
-      - "CMakeLists.txt:2 (project)"
-    message: |
-      Detecting CXX compiler apple sysroot: "/usr/bin/c++" "-E" "apple-sdk.cpp"
-        # 1 "apple-sdk.cpp"
-        # 1 "<built-in>" 1
-        # 1 "<built-in>" 3
-        # 531 "<built-in>" 3
-        # 1 "<command line>" 1
-        # 1 "<built-in>" 2
-        # 1 "apple-sdk.cpp" 2
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 1 3 4
-        # 89 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 3 4
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h" 1 3 4
-        # 90 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 2 3 4
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h" 1 3 4
-        # 91 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 2 3 4
-        # 207 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 3 4
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 1 3 4
-        # 196 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 3 4
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h" 1 3 4
-        # 197 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 2 3 4
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h" 1 3 4
-        # 33 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h" 3 4
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h" 1 3 4
-        # 34 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h" 2 3 4
-        # 198 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 2 3 4
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h" 1 3 4
-        # 34 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h" 3 4
-        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h" 1 3 4
-        # 35 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h" 2 3 4
-        # 199 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 2 3 4
-        # 208 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 2 3 4
-        # 2 "apple-sdk.cpp" 2
-        
-        
-      Found apple sysroot: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_AR"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -435,75 +301,50 @@ events:
       - "ar"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     found: "/usr/bin/ar"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_RANLIB"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -513,75 +354,50 @@ events:
       - "ranlib"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     found: "/usr/bin/ranlib"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_STRIP"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -591,75 +407,50 @@ events:
       - "strip"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     found: "/usr/bin/strip"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_LINKER"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -669,75 +460,50 @@ events:
       - "ld"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     found: "/usr/bin/ld"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_NM"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -747,75 +513,50 @@ events:
       - "nm"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     found: "/usr/bin/nm"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_OBJDUMP"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -825,75 +566,50 @@ events:
       - "objdump"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     found: "/usr/bin/objdump"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_OBJCOPY"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -903,101 +619,50 @@ events:
       - "objcopy"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
-    searched_directories:
-      - "/usr/bin/objcopy"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/objcopy"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/objcopy"
-      - "/opt/homebrew/bin/objcopy"
-      - "/opt/homebrew/sbin/objcopy"
-      - "/usr/local/bin/objcopy"
-      - "/System/Cryptexes/App/usr/bin/objcopy"
-      - "/bin/objcopy"
-      - "/usr/sbin/objcopy"
-      - "/sbin/objcopy"
-      - "/usr/local/apache-maven-3.9.1/bin/objcopy"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/objcopy"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/objcopy"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/objcopy"
-      - "/opt/pmk/env/global/bin/objcopy"
-      - "/Library/Apple/usr/bin/objcopy"
-      - "/usr/local/share/dotnet/objcopy"
-      - "/Users/savanisawaikar/.dotnet/tools/objcopy"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/objcopy"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/objcopy"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/objcopy"
-      - "/Users/savanisawaikar/.cargo/bin/objcopy"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/objcopy"
-      - "/Users/savanisawaikar/.local/bin/objcopy"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/objcopy"
-    found: false
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
+    found: "/usr/bin/objcopy"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_READELF"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -1007,101 +672,50 @@ events:
       - "readelf"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
-    searched_directories:
-      - "/usr/bin/readelf"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/readelf"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/readelf"
-      - "/opt/homebrew/bin/readelf"
-      - "/opt/homebrew/sbin/readelf"
-      - "/usr/local/bin/readelf"
-      - "/System/Cryptexes/App/usr/bin/readelf"
-      - "/bin/readelf"
-      - "/usr/sbin/readelf"
-      - "/sbin/readelf"
-      - "/usr/local/apache-maven-3.9.1/bin/readelf"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/readelf"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/readelf"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/readelf"
-      - "/opt/pmk/env/global/bin/readelf"
-      - "/Library/Apple/usr/bin/readelf"
-      - "/usr/local/share/dotnet/readelf"
-      - "/Users/savanisawaikar/.dotnet/tools/readelf"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/readelf"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/readelf"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/readelf"
-      - "/Users/savanisawaikar/.cargo/bin/readelf"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/readelf"
-      - "/Users/savanisawaikar/.local/bin/readelf"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/readelf"
-    found: false
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
+    found: "/usr/bin/readelf"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_DLLTOOL"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -1111,101 +725,63 @@ events:
       - "dlltool"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     searched_directories:
       - "/usr/bin/dlltool"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/dlltool"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/dlltool"
-      - "/opt/homebrew/bin/dlltool"
-      - "/opt/homebrew/sbin/dlltool"
+      - "/home/sara/.local/bin/dlltool"
+      - "/home/sara/Applications/dlltool"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/dlltool"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/dlltool"
+      - "/home/sara/.cargo/bin/dlltool"
+      - "/usr/local/sbin/dlltool"
       - "/usr/local/bin/dlltool"
-      - "/System/Cryptexes/App/usr/bin/dlltool"
-      - "/bin/dlltool"
-      - "/usr/sbin/dlltool"
-      - "/sbin/dlltool"
-      - "/usr/local/apache-maven-3.9.1/bin/dlltool"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/dlltool"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/dlltool"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/dlltool"
-      - "/opt/pmk/env/global/bin/dlltool"
-      - "/Library/Apple/usr/bin/dlltool"
-      - "/usr/local/share/dotnet/dlltool"
-      - "/Users/savanisawaikar/.dotnet/tools/dlltool"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/dlltool"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/dlltool"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/dlltool"
-      - "/Users/savanisawaikar/.cargo/bin/dlltool"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/dlltool"
-      - "/Users/savanisawaikar/.local/bin/dlltool"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/dlltool"
+      - "/usr/bin/site_perl/dlltool"
+      - "/usr/bin/vendor_perl/dlltool"
+      - "/usr/bin/core_perl/dlltool"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/dlltool"
     found: false
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_ADDR2LINE"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -1215,101 +791,50 @@ events:
       - "addr2line"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
-    searched_directories:
-      - "/usr/bin/addr2line"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/addr2line"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/addr2line"
-      - "/opt/homebrew/bin/addr2line"
-      - "/opt/homebrew/sbin/addr2line"
-      - "/usr/local/bin/addr2line"
-      - "/System/Cryptexes/App/usr/bin/addr2line"
-      - "/bin/addr2line"
-      - "/usr/sbin/addr2line"
-      - "/sbin/addr2line"
-      - "/usr/local/apache-maven-3.9.1/bin/addr2line"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/addr2line"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/addr2line"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/addr2line"
-      - "/opt/pmk/env/global/bin/addr2line"
-      - "/Library/Apple/usr/bin/addr2line"
-      - "/usr/local/share/dotnet/addr2line"
-      - "/Users/savanisawaikar/.dotnet/tools/addr2line"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/addr2line"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/addr2line"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/addr2line"
-      - "/Users/savanisawaikar/.cargo/bin/addr2line"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/addr2line"
-      - "/Users/savanisawaikar/.local/bin/addr2line"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/addr2line"
-    found: false
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
+    found: "/usr/bin/addr2line"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeFindBinUtils.cmake:238 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
     variable: "CMAKE_TAPI"
     description: "Path to a program."
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
       CMAKE_FIND_USE_CMAKE_PATH: false
       CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
@@ -1319,376 +844,478 @@ events:
       - "tapi"
     candidate_directories:
       - "/usr/bin/"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
       - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     searched_directories:
       - "/usr/bin/tapi"
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/tapi"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/tapi"
-      - "/opt/homebrew/bin/tapi"
-      - "/opt/homebrew/sbin/tapi"
+      - "/home/sara/.local/bin/tapi"
+      - "/home/sara/Applications/tapi"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/tapi"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/tapi"
+      - "/home/sara/.cargo/bin/tapi"
+      - "/usr/local/sbin/tapi"
       - "/usr/local/bin/tapi"
-      - "/System/Cryptexes/App/usr/bin/tapi"
-      - "/bin/tapi"
-      - "/usr/sbin/tapi"
-      - "/sbin/tapi"
-      - "/usr/local/apache-maven-3.9.1/bin/tapi"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/tapi"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/tapi"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/tapi"
-      - "/opt/pmk/env/global/bin/tapi"
-      - "/Library/Apple/usr/bin/tapi"
-      - "/usr/local/share/dotnet/tapi"
-      - "/Users/savanisawaikar/.dotnet/tools/tapi"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/tapi"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/tapi"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/tapi"
-      - "/Users/savanisawaikar/.cargo/bin/tapi"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/tapi"
-      - "/Users/savanisawaikar/.local/bin/tapi"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/tapi"
+      - "/usr/bin/site_perl/tapi"
+      - "/usr/bin/vendor_perl/tapi"
+      - "/usr/bin/core_perl/tapi"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/tapi"
     found: false
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "find-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/Platform/Darwin.cmake:76 (find_program)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:32 (include)"
+      - "/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:18 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:207 (include)"
       - "CMakeLists.txt:2 (project)"
     mode: "program"
-    variable: "CMAKE_INSTALL_NAME_TOOL"
-    description: "Path to a program."
+    variable: "CMAKE_CXX_COMPILER_AR"
+    description: "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
     settings:
-      SearchFramework: "FIRST"
-      SearchAppBundle: "FIRST"
-      CMAKE_FIND_USE_CMAKE_PATH: true
-      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
       CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
       CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
       CMAKE_FIND_USE_INSTALL_PREFIX: true
     names:
-      - "install_name_tool"
+      - "gcc-ar-15.2"
+      - "gcc-ar-15"
+      - "gcc-ar15"
+      - "gcc-ar"
     candidate_directories:
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/"
-      - "/opt/homebrew/bin/"
-      - "/opt/homebrew/sbin/"
-      - "/usr/local/bin/"
-      - "/System/Cryptexes/App/usr/bin/"
       - "/usr/bin/"
-      - "/bin/"
-      - "/usr/sbin/"
-      - "/sbin/"
-      - "/usr/local/apache-maven-3.9.1/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
-      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
-      - "/opt/pmk/env/global/bin/"
-      - "/Library/Apple/usr/bin/"
-      - "/usr/local/share/dotnet/"
-      - "/Users/savanisawaikar/.dotnet/tools/"
-      - "/Library/Frameworks/Mono.framework/Versions/Current/Commands/"
-      - "/Applications/Postgres.app/Contents/Versions/latest/bin/"
-      - "/opt/homebrew/Caskroom/miniconda/base/condabin/"
-      - "/Users/savanisawaikar/.cargo/bin/"
-      - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts/"
-      - "/Users/savanisawaikar/.local/bin/"
-      - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
     searched_directories:
-      - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin/install_name_tool"
-      - "/Library/Frameworks/Python.framework/Versions/3.10/bin/install_name_tool"
-      - "/opt/homebrew/bin/install_name_tool"
-      - "/opt/homebrew/sbin/install_name_tool"
-      - "/usr/local/bin/install_name_tool"
-      - "/System/Cryptexes/App/usr/bin/install_name_tool"
-    found: "/usr/bin/install_name_tool"
+      - "/usr/bin/gcc-ar-15.2"
+      - "/home/sara/.local/bin/gcc-ar-15.2"
+      - "/home/sara/Applications/gcc-ar-15.2"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-15.2"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gcc-ar-15.2"
+      - "/home/sara/.cargo/bin/gcc-ar-15.2"
+      - "/usr/local/sbin/gcc-ar-15.2"
+      - "/usr/local/bin/gcc-ar-15.2"
+      - "/usr/bin/site_perl/gcc-ar-15.2"
+      - "/usr/bin/vendor_perl/gcc-ar-15.2"
+      - "/usr/bin/core_perl/gcc-ar-15.2"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/gcc-ar-15.2"
+      - "/usr/bin/gcc-ar-15"
+      - "/home/sara/.local/bin/gcc-ar-15"
+      - "/home/sara/Applications/gcc-ar-15"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar-15"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gcc-ar-15"
+      - "/home/sara/.cargo/bin/gcc-ar-15"
+      - "/usr/local/sbin/gcc-ar-15"
+      - "/usr/local/bin/gcc-ar-15"
+      - "/usr/bin/site_perl/gcc-ar-15"
+      - "/usr/bin/vendor_perl/gcc-ar-15"
+      - "/usr/bin/core_perl/gcc-ar-15"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/gcc-ar-15"
+      - "/usr/bin/gcc-ar15"
+      - "/home/sara/.local/bin/gcc-ar15"
+      - "/home/sara/Applications/gcc-ar15"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ar15"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gcc-ar15"
+      - "/home/sara/.cargo/bin/gcc-ar15"
+      - "/usr/local/sbin/gcc-ar15"
+      - "/usr/local/bin/gcc-ar15"
+      - "/usr/bin/site_perl/gcc-ar15"
+      - "/usr/bin/vendor_perl/gcc-ar15"
+      - "/usr/bin/core_perl/gcc-ar15"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/gcc-ar15"
+    found: "/usr/bin/gcc-ar"
     search_context:
       ENV{PATH}:
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/opt/homebrew/bin"
-        - "/opt/homebrew/sbin"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
         - "/usr/local/bin"
-        - "/System/Cryptexes/App/usr/bin"
         - "/usr/bin"
-        - "/bin"
-        - "/usr/sbin"
-        - "/sbin"
-        - "/usr/local/apache-maven-3.9.1/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
-        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
-        - "/opt/pmk/env/global/bin"
-        - "/Library/Apple/usr/bin"
-        - "/usr/local/share/dotnet"
-        - "~/.dotnet/tools"
-        - "/Library/Frameworks/Mono.framework/Versions/Current/Commands"
-        - "/Applications/Postgres.app/Contents/Versions/latest/bin"
-        - "/opt/homebrew/Caskroom/miniconda/base/condabin"
-        - "/Users/savanisawaikar/.nvm/versions/node/v22.12.0/bin"
-        - "/Library/Frameworks/Python.framework/Versions/3.10/bin"
-        - "/Users/savanisawaikar/.cargo/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/Library/Application Support/JetBrains/Toolbox/scripts"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.local/bin"
-        - "/Users/savanisawaikar/.claude/plugins/cache/claude-plugins-official/clangd-lsp/1.0.0/bin"
-      CMAKE_INSTALL_PREFIX: "/usr/local"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:30 (find_program)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:207 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER_RANLIB"
+    description: "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gcc-ranlib-15.2"
+      - "gcc-ranlib-15"
+      - "gcc-ranlib15"
+      - "gcc-ranlib"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/sara/.local/bin/"
+      - "/home/sara/Applications/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/"
+      - "/home/sara/.cargo/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/bin/site_perl/"
+      - "/usr/bin/vendor_perl/"
+      - "/usr/bin/core_perl/"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/"
+    searched_directories:
+      - "/usr/bin/gcc-ranlib-15.2"
+      - "/home/sara/.local/bin/gcc-ranlib-15.2"
+      - "/home/sara/Applications/gcc-ranlib-15.2"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-15.2"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gcc-ranlib-15.2"
+      - "/home/sara/.cargo/bin/gcc-ranlib-15.2"
+      - "/usr/local/sbin/gcc-ranlib-15.2"
+      - "/usr/local/bin/gcc-ranlib-15.2"
+      - "/usr/bin/site_perl/gcc-ranlib-15.2"
+      - "/usr/bin/vendor_perl/gcc-ranlib-15.2"
+      - "/usr/bin/core_perl/gcc-ranlib-15.2"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/gcc-ranlib-15.2"
+      - "/usr/bin/gcc-ranlib-15"
+      - "/home/sara/.local/bin/gcc-ranlib-15"
+      - "/home/sara/Applications/gcc-ranlib-15"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib-15"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gcc-ranlib-15"
+      - "/home/sara/.cargo/bin/gcc-ranlib-15"
+      - "/usr/local/sbin/gcc-ranlib-15"
+      - "/usr/local/bin/gcc-ranlib-15"
+      - "/usr/bin/site_perl/gcc-ranlib-15"
+      - "/usr/bin/vendor_perl/gcc-ranlib-15"
+      - "/usr/bin/core_perl/gcc-ranlib-15"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/gcc-ranlib-15"
+      - "/usr/bin/gcc-ranlib15"
+      - "/home/sara/.local/bin/gcc-ranlib15"
+      - "/home/sara/Applications/gcc-ranlib15"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand/gcc-ranlib15"
+      - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli/gcc-ranlib15"
+      - "/home/sara/.cargo/bin/gcc-ranlib15"
+      - "/usr/local/sbin/gcc-ranlib15"
+      - "/usr/local/bin/gcc-ranlib15"
+      - "/usr/bin/site_perl/gcc-ranlib15"
+      - "/usr/bin/vendor_perl/gcc-ranlib15"
+      - "/usr/bin/core_perl/gcc-ranlib15"
+      - "/home/sara/.local/share/gem/ruby/3.4.0/bin/gcc-ranlib15"
+    found: "/usr/bin/gcc-ranlib"
+    search_context:
+      ENV{PATH}:
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/debugCommand"
+        - "/home/sara/.config/Code/User/globalStorage/github.copilot-chat/copilotCli"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.local/bin"
+        - "/home/sara/Applications"
+        - "/home/sara/.cargo/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/bin"
+        - "/usr/bin/site_perl"
+        - "/usr/bin/vendor_perl"
+        - "/usr/bin/core_perl"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
+        - "/home/sara/.local/share/gem/ruby/3.4.0/bin"
   -
     kind: "try_compile-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "/Users/savanisawaikar/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-dzd2g1"
-      binary: "/Users/savanisawaikar/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-dzd2g1"
+      source: "/home/sara/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-p5vB0e"
+      binary: "/home/sara/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-p5vB0e"
     cmakeVariables:
       CMAKE_CXX_FLAGS: ""
       CMAKE_CXX_FLAGS_DEBUG: "-g"
       CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_CXX_STDLIB_MODULES_JSON: ""
       CMAKE_EXE_LINKER_FLAGS: ""
-      CMAKE_OSX_ARCHITECTURES: ""
-      CMAKE_OSX_DEPLOYMENT_TARGET: ""
-      CMAKE_OSX_SYSROOT: ""
     buildResult:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/Users/savanisawaikar/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-dzd2g1'
+        Change Dir: '/home/sara/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-p5vB0e'
         
-        Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_cb6b2/fast
-        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_cb6b2.dir/build.make CMakeFiles/cmTC_cb6b2.dir/build
-        Building CXX object CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o
-        /usr/bin/c++   -arch arm64   -v -Wl,-v -MD -MT CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp
-        Apple clang version 21.0.0 (clang-2100.0.123.102)
-        Target: arm64-apple-darwin25.3.0
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_eceeb/fast
+        /usr/bin/make  -f CMakeFiles/cmTC_eceeb.dir/build.make CMakeFiles/cmTC_eceeb.dir/build
+        make[1]: Entering directory '/home/sara/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-p5vB0e'
+        Building CXX object CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o
+        /usr/bin/c++   -v -o CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/c++
+        Target: x86_64-pc-linux-gnu
+        Configured with: /build/gcc/src/gcc/configure --enable-languages=ada,c,c++,d,fortran,go,lto,m2,objc,obj-c++,rust,cobol --enable-bootstrap --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://gitlab.archlinux.org/archlinux/packaging/packages/gcc/-/issues --with-build-config=bootstrap-lto --with-linker-hash-style=gnu --with-system-zlib --enable-__cxa_atexit --enable-cet=auto --enable-checking=release --enable-clocale=gnu --enable-default-pie --enable-default-ssp --enable-gnu-indirect-function --enable-gnu-unique-object --enable-libstdcxx-backtrace --enable-link-serialization=1 --enable-linker-build-id --enable-lto --enable-multilib --enable-plugin --enable-shared --enable-threads=posix --disable-libssp --disable-libstdcxx-pch --disable-werror
         Thread model: posix
-        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-        clang++: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
-        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"
-         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple arm64-apple-macosx26.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -fno-sized-deallocation -target-sdk-version=26.4 -fvisibility-inlines-hidden-static-local-var -fno-modulemap-allow-subdirectory-search -fdefine-target-os-macros -fno-assume-unique-vtables -fno-modulemap-allow-subdirectory-search -enable-tlsdesc -target-cpu apple-m1 -target-feature +v8.5a -target-feature +aes -target-feature +altnzcv -target-feature +ccdp -target-feature +ccpp -target-feature +complxnum -target-feature +crc -target-feature +dotprod -target-feature +flagm -target-feature +fp-armv8 -target-feature +fp16fml -target-feature +fptoint -target-feature +fullfp16 -target-feature +jsconv -target-feature +lse -target-feature +neon -target-feature +pauth -target-feature +perfmon -target-feature +predres -target-feature +ras -target-feature +rcpc -target-feature +rdm -target-feature +sb -target-feature +sha2 -target-feature +sha3 -target-feature +specrestrict -target-feature +ssbs -target-abi darwinpcs -debugger-tuning=lldb -fdebug-compilation-dir=/Users/savanisawaikar/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-dzd2g1 -target-linker-version 1266.8 -v -fcoverage-compilation-dir=/Users/savanisawaikar/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-dzd2g1 -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21 -dependency-file CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -I/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/SubFrameworks -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks -Wno-elaborated-enum-base -fdeprecated-macro -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -Wno-error=allocator-wrappers -fdwarf2-cfi-asm -o CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp
-        clang -cc1 version 21.0.0 (clang-2100.0.123.102) default target arm64-apple-darwin25.3.0
-        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include"
-        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 15.2.1 20260209 (GCC) 
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_eceeb.dir/'
+         /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/cc1plus -quiet -v -D_GNU_SOURCE /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_eceeb.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o /tmp/ccc5uKv0.s
+        GNU C++17 (GCC) version 15.2.1 20260209 (x86_64-pc-linux-gnu)
+        	compiled by GNU C version 15.2.1 20260209, GMP version 6.3.0, MPFR version 4.2.2, MPC version 1.3.1, isl version isl-0.27-GMP
+        
+        warning: MPC header version 1.3.1 differs from library version 1.4.0.
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../x86_64-pc-linux-gnu/include"
         #include "..." search starts here:
         #include <...> search starts here:
+         /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1
+         /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1/x86_64-pc-linux-gnu
+         /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1/backward
+         /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include
          /usr/local/include
-         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1
-         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include
-         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
-         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
-         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)
-         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/SubFrameworks (framework directory)
+         /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include-fixed
+         /usr/include
         End of search list.
-        Linking CXX executable cmTC_cb6b2
-        /opt/homebrew/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cb6b2.dir/link.txt --verbose=1
-        Apple clang version 21.0.0 (clang-2100.0.123.102)
-        Target: arm64-apple-darwin25.3.0
+        Compiler executable checksum: 5e3969de92aa3c12a625237f01b15b2f
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_eceeb.dir/'
+         as -v --64 -o CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccc5uKv0.s
+        GNU assembler version 2.46 (x86_64-pc-linux-gnu) using BFD version (GNU Binutils) 2.46
+        COMPILER_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.'
+        Linking CXX executable cmTC_eceeb
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_eceeb.dir/link.txt --verbose=1
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/c++
+        COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/lto-wrapper
+        Target: x86_64-pc-linux-gnu
+        Configured with: /build/gcc/src/gcc/configure --enable-languages=ada,c,c++,d,fortran,go,lto,m2,objc,obj-c++,rust,cobol --enable-bootstrap --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://gitlab.archlinux.org/archlinux/packaging/packages/gcc/-/issues --with-build-config=bootstrap-lto --with-linker-hash-style=gnu --with-system-zlib --enable-__cxa_atexit --enable-cet=auto --enable-checking=release --enable-clocale=gnu --enable-default-pie --enable-default-ssp --enable-gnu-indirect-function --enable-gnu-unique-object --enable-libstdcxx-backtrace --enable-link-serialization=1 --enable-linker-build-id --enable-lto --enable-multilib --enable-plugin --enable-shared --enable-threads=posix --disable-libssp --disable-libstdcxx-pch --disable-werror
         Thread model: posix
-        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
-         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 26.0.0 26.4 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_cb6b2 -L/usr/local/lib -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/lib/darwin/libclang_rt.osx.a
-        @(#)PROGRAM:ld PROJECT:ld-1266.8
-        BUILD 16:03:08 Mar  6 2026
-        configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em armv8m.main armv8.1m.main
-        will use ld-classic for: armv6 armv7 armv7s i386 armv6m armv7k armv7m armv7em
-        LTO support using: LLVM version 21.0.0 (static support for 30, runtime is 30)
-        TAPI support using: Apple TAPI version 21.0.0 (tapi-2100.0.2.6)
-        Library search paths:
-        	/usr/local/lib
-        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib
-        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift
-        Framework search paths:
-        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks
-        /usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_cb6b2
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 15.2.1 20260209 (GCC) 
+        COMPILER_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_eceeb' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_eceeb.'
+         /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbEeO4A.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_eceeb /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o
+        collect2 version 15.2.1 20260209
+        /usr/bin/ld -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbEeO4A.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_eceeb /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o
+        GNU ld (GNU Binutils) 2.46
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_eceeb' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_eceeb.'
+        /usr/bin/c++  -v -Wl,-v CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_eceeb
+        make[1]: Leaving directory '/home/sara/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-p5vB0e'
         
       exitCode: 0
   -
     kind: "message-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:122 (message)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
-      - "CMakeLists.txt:2 (project)"
-    message: |
-      Effective list of requested architectures (possibly empty)  : ""
-      Effective list of architectures found in the ABI info binary: "arm64"
-  -
-    kind: "message-v1"
-    backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:217 (message)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:217 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     message: |
       Parsed CXX implicit include dir info: rv=done
         found start of include info
         found start of implicit include info
+          add: [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1]
+          add: [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1/x86_64-pc-linux-gnu]
+          add: [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1/backward]
+          add: [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include]
           add: [/usr/local/include]
-          add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1]
-          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include]
-          add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
-          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+          add: [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include-fixed]
+          add: [/usr/include]
         end of search list found
+        collapse include dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1] ==> [/usr/include/c++/15.2.1]
+        collapse include dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1/x86_64-pc-linux-gnu] ==> [/usr/include/c++/15.2.1/x86_64-pc-linux-gnu]
+        collapse include dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1/backward] ==> [/usr/include/c++/15.2.1/backward]
+        collapse include dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include] ==> [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include]
         collapse include dir [/usr/local/include] ==> [/usr/local/include]
-        collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1]
-        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include]
-        collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
-        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
-        implicit include dirs: [/usr/local/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        collapse include dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include-fixed] ==> [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include-fixed]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/usr/include/c++/15.2.1;/usr/include/c++/15.2.1/x86_64-pc-linux-gnu;/usr/include/c++/15.2.1/backward;/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include;/usr/local/include;/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include-fixed;/usr/include]
       
       
   -
     kind: "message-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     message: |
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
-        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
-        ignore line: [Change Dir: '/Users/savanisawaikar/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-dzd2g1']
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
+        ignore line: [Change Dir: '/home/sara/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-p5vB0e']
         ignore line: []
-        ignore line: [Run Build Command(s): /opt/homebrew/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_cb6b2/fast]
-        ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_cb6b2.dir/build.make CMakeFiles/cmTC_cb6b2.dir/build]
-        ignore line: [Building CXX object CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o]
-        ignore line: [/usr/bin/c++   -arch arm64   -v -Wl -v -MD -MT CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
-        ignore line: [Apple clang version 21.0.0 (clang-2100.0.123.102)]
-        ignore line: [Target: arm64-apple-darwin25.3.0]
+        ignore line: [Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_eceeb/fast]
+        ignore line: [/usr/bin/make  -f CMakeFiles/cmTC_eceeb.dir/build.make CMakeFiles/cmTC_eceeb.dir/build]
+        ignore line: [make[1]: Entering directory '/home/sara/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-p5vB0e']
+        ignore line: [Building CXX object CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o]
+        ignore line: [/usr/bin/c++   -v -o CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/c++]
+        ignore line: [Target: x86_64-pc-linux-gnu]
+        ignore line: [Configured with: /build/gcc/src/gcc/configure --enable-languages=ada c c++ d fortran go lto m2 objc obj-c++ rust cobol --enable-bootstrap --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://gitlab.archlinux.org/archlinux/packaging/packages/gcc/-/issues --with-build-config=bootstrap-lto --with-linker-hash-style=gnu --with-system-zlib --enable-__cxa_atexit --enable-cet=auto --enable-checking=release --enable-clocale=gnu --enable-default-pie --enable-default-ssp --enable-gnu-indirect-function --enable-gnu-unique-object --enable-libstdcxx-backtrace --enable-link-serialization=1 --enable-linker-build-id --enable-lto --enable-multilib --enable-plugin --enable-shared --enable-threads=posix --disable-libssp --disable-libstdcxx-pch --disable-werror]
         ignore line: [Thread model: posix]
-        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
-        ignore line: [clang++: warning: -Wl -v: 'linker' input unused [-Wunused-command-line-argument]]
-        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"]
-        ignore line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple arm64-apple-macosx26.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -fno-sized-deallocation -target-sdk-version=26.4 -fvisibility-inlines-hidden-static-local-var -fno-modulemap-allow-subdirectory-search -fdefine-target-os-macros -fno-assume-unique-vtables -fno-modulemap-allow-subdirectory-search -enable-tlsdesc -target-cpu apple-m1 -target-feature +v8.5a -target-feature +aes -target-feature +altnzcv -target-feature +ccdp -target-feature +ccpp -target-feature +complxnum -target-feature +crc -target-feature +dotprod -target-feature +flagm -target-feature +fp-armv8 -target-feature +fp16fml -target-feature +fptoint -target-feature +fullfp16 -target-feature +jsconv -target-feature +lse -target-feature +neon -target-feature +pauth -target-feature +perfmon -target-feature +predres -target-feature +ras -target-feature +rcpc -target-feature +rdm -target-feature +sb -target-feature +sha2 -target-feature +sha3 -target-feature +specrestrict -target-feature +ssbs -target-abi darwinpcs -debugger-tuning=lldb -fdebug-compilation-dir=/Users/savanisawaikar/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-dzd2g1 -target-linker-version 1266.8 -v -fcoverage-compilation-dir=/Users/savanisawaikar/algoscwk2/build/CMakeFiles/CMakeScratch/TryCompile-dzd2g1 -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21 -dependency-file CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -I/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1 -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/SubFrameworks -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks -Wno-elaborated-enum-base -fdeprecated-macro -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -Wno-error=allocator-wrappers -fdwarf2-cfi-asm -o CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
-        ignore line: [clang -cc1 version 21.0.0 (clang-2100.0.123.102) default target arm64-apple-darwin25.3.0]
-        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include"]
-        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 15.2.1 20260209 (GCC) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_eceeb.dir/']
+        ignore line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/cc1plus -quiet -v -D_GNU_SOURCE /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_eceeb.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -o /tmp/ccc5uKv0.s]
+        ignore line: [GNU C++17 (GCC) version 15.2.1 20260209 (x86_64-pc-linux-gnu)]
+        ignore line: [	compiled by GNU C version 15.2.1 20260209  GMP version 6.3.0  MPFR version 4.2.2  MPC version 1.3.1  isl version isl-0.27-GMP]
+        ignore line: []
+        ignore line: [warning: MPC header version 1.3.1 differs from library version 1.4.0.]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../x86_64-pc-linux-gnu/include"]
         ignore line: [#include "..." search starts here:]
         ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1]
+        ignore line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1/x86_64-pc-linux-gnu]
+        ignore line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../include/c++/15.2.1/backward]
+        ignore line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include]
         ignore line: [ /usr/local/include]
-        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1]
-        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/include]
-        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
-        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
-        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)]
-        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/SubFrameworks (framework directory)]
+        ignore line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/include-fixed]
+        ignore line: [ /usr/include]
         ignore line: [End of search list.]
-        ignore line: [Linking CXX executable cmTC_cb6b2]
-        ignore line: [/opt/homebrew/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cb6b2.dir/link.txt --verbose=1]
-        ignore line: [Apple clang version 21.0.0 (clang-2100.0.123.102)]
-        ignore line: [Target: arm64-apple-darwin25.3.0]
+        ignore line: [Compiler executable checksum: 5e3969de92aa3c12a625237f01b15b2f]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_eceeb.dir/']
+        ignore line: [ as -v --64 -o CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccc5uKv0.s]
+        ignore line: [GNU assembler version 2.46 (x86_64-pc-linux-gnu) using BFD version (GNU Binutils) 2.46]
+        ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.']
+        ignore line: [Linking CXX executable cmTC_eceeb]
+        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_eceeb.dir/link.txt --verbose=1]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/c++]
+        ignore line: [COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/lto-wrapper]
+        ignore line: [Target: x86_64-pc-linux-gnu]
+        ignore line: [Configured with: /build/gcc/src/gcc/configure --enable-languages=ada c c++ d fortran go lto m2 objc obj-c++ rust cobol --enable-bootstrap --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://gitlab.archlinux.org/archlinux/packaging/packages/gcc/-/issues --with-build-config=bootstrap-lto --with-linker-hash-style=gnu --with-system-zlib --enable-__cxa_atexit --enable-cet=auto --enable-checking=release --enable-clocale=gnu --enable-default-pie --enable-default-ssp --enable-gnu-indirect-function --enable-gnu-unique-object --enable-libstdcxx-backtrace --enable-link-serialization=1 --enable-linker-build-id --enable-lto --enable-multilib --enable-plugin --enable-shared --enable-threads=posix --disable-libssp --disable-libstdcxx-pch --disable-werror]
         ignore line: [Thread model: posix]
-        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
-        link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 26.0.0 26.4 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_cb6b2 -L/usr/local/lib -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/lib/darwin/libclang_rt.osx.a]
-          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
-          arg [-demangle] ==> ignore
-          arg [-lto_library] ==> ignore, skip following value
-          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib] ==> skip value of -lto_library
-          arg [-dynamic] ==> ignore
-          arg [-arch] ==> ignore
-          arg [arm64] ==> ignore
-          arg [-platform_version] ==> ignore
-          arg [macos] ==> ignore
-          arg [26.0.0] ==> ignore
-          arg [26.4] ==> ignore
-          arg [-syslibroot] ==> ignore
-          arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk] ==> ignore
-          arg [-mllvm] ==> ignore
-          arg [-enable-linkonceodr-outlining] ==> ignore
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 15.2.1 20260209 (GCC) ]
+        ignore line: [COMPILER_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/:/lib/../lib/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_eceeb' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_eceeb.']
+        link line: [ /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/collect2 -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbEeO4A.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_eceeb /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o]
+          arg [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/collect2] ==> ignore
+          arg [-plugin] ==> ignore
+          arg [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/liblto_plugin.so] ==> ignore
+          arg [-plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/lto-wrapper] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/ccbEeO4A.res] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-pie] ==> ignore
           arg [-o] ==> ignore
-          arg [cmTC_cb6b2] ==> ignore
-          arg [-L/usr/local/lib] ==> dir [/usr/local/lib]
-          arg [-search_paths_first] ==> ignore
-          arg [-headerpad_max_install_names] ==> ignore
+          arg [cmTC_eceeb] ==> ignore
+          arg [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o] ==> obj [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o]
+          arg [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o] ==> obj [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o]
+          arg [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o] ==> obj [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o]
+          arg [-L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1] ==> dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1]
+          arg [-L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib] ==> dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib]
+          arg [-L/lib/../lib] ==> dir [/lib/../lib]
+          arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+          arg [-L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../..] ==> dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../..]
+          arg [-L/lib] ==> dir [/lib]
+          arg [-L/usr/lib] ==> dir [/usr/lib]
           arg [-v] ==> ignore
-          arg [CMakeFiles/cmTC_cb6b2.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
-          arg [-lc++] ==> lib [c++]
-          arg [-lSystem] ==> lib [System]
-          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/lib/darwin/libclang_rt.osx.a]
-        linker tool for 'CXX': /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
-        Library search paths: [;/usr/local/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift]
-        Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
-        remove lib [System]
-        remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/21/lib/darwin/libclang_rt.osx.a]
-        collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
-        collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
-        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib]
-        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift]
-        collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
-        implicit libs: [c++]
-        implicit objs: []
-        implicit dirs: [/usr/local/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift]
-        implicit fwks: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
+          arg [CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lstdc++] ==> lib [stdc++]
+          arg [-lm] ==> lib [m]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [-lc] ==> lib [c]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtendS.o] ==> obj [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtendS.o]
+          arg [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o] ==> obj [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o]
+        ignore line: [collect2 version 15.2.1 20260209]
+        ignore line: [/usr/bin/ld -plugin /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/liblto_plugin.so -plugin-opt=/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/lto-wrapper -plugin-opt=-fresolution=/tmp/ccbEeO4A.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr --hash-style=gnu -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -o cmTC_eceeb /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1 -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib -L/lib/../lib -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_eceeb.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtendS.o /usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o]
+        linker tool for 'CXX': /usr/bin/ld
+        collapse obj [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/Scrt1.o] ==> [/usr/lib/Scrt1.o]
+        collapse obj [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crti.o] ==> [/usr/lib/crti.o]
+        collapse obj [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib/crtn.o] ==> [/usr/lib/crtn.o]
+        collapse library dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1] ==> [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1]
+        collapse library dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../../../lib] ==> [/usr/lib]
+        collapse library dir [/lib/../lib] ==> [/lib]
+        collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+        collapse library dir [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/../../..] ==> [/usr/lib]
+        collapse library dir [/lib] ==> [/lib]
+        collapse library dir [/usr/lib] ==> [/usr/lib]
+        implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+        implicit objs: [/usr/lib/Scrt1.o;/usr/lib/crti.o;/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtbeginS.o;/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1/crtendS.o;/usr/lib/crtn.o]
+        implicit dirs: [/usr/lib/gcc/x86_64-pc-linux-gnu/15.2.1;/usr/lib;/lib]
+        implicit fwks: []
       
       
   -
     kind: "message-v1"
     backtrace:
-      - "/opt/homebrew/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake:36 (message)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
-      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "/usr/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     message: |
-      Running the CXX compiler's linker: "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" "-v"
-      @(#)PROGRAM:ld PROJECT:ld-1266.8
-      BUILD 16:03:08 Mar  6 2026
-      configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em armv8m.main armv8.1m.main
-      will use ld-classic for: armv6 armv7 armv7s i386 armv6m armv7k armv7m armv7em
-      LTO support using: LLVM version 21.0.0 (static support for 30, runtime is 30)
-      TAPI support using: Apple TAPI version 21.0.0 (tapi-2100.0.2.6)
+      Running the CXX compiler's linker: "/usr/bin/ld" "-v"
+      GNU ld (GNU Binutils) 2.46
 ...

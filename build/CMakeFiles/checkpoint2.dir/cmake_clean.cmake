@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/checkpoint2.dir/link.d"
   "CMakeFiles/checkpoint2.dir/src/checkpoint2.cpp.o"
   "CMakeFiles/checkpoint2.dir/src/checkpoint2.cpp.o.d"
   "checkpoint2"

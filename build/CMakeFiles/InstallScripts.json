@@ -1,7 +1,7 @@
 {
 	"InstallScripts" : 
 	[
-		"/Users/savanisawaikar/algoscwk2/build/cmake_install.cmake"
+		"/home/sara/algoscwk2/build/cmake_install.cmake"
 	],
 	"Parallel" : false
 }
