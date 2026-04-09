@@ -1,5 +1,5 @@
 detector,sketch,seed,tp,fp,fn,precision,recall,f1
-baseline_raw_l1,CMS,42,7,0,2,1,0.777778,0.875
-improved_normalized,CMS,44,9,0,0,1,1,1
-improved_normalized,CU-CMS,44,9,0,0,1,1,1
-improved_normalized,CS,44,9,0,0,1,1,1
+baseline_raw_l1,CMS,42,9,0,0,1,1,1
+improved_normalized,CMS,44,9,1,0,0.9,1,0.947368
+improved_normalized,CU-CMS,44,9,1,0,0.9,1,0.947368
+improved_normalized,CS,44,9,24,0,0.272727,1,0.428571
