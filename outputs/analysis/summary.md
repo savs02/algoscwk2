@@ -1,10 +1,10 @@
 # Evaluation Summary
 
 ## Detector
-- Baseline raw L1 F1: 1.000
+- Baseline raw L1 F1: 0.800
 - Improved normalized detector best threshold: 0.50
 - Best validation mean F1: 0.900
-- Held-out improved F1 (all sketches): 0.774
+- Held-out improved F1 (all sketches): 0.647
 
 ## Sweeps
 - Best bins setting in current sweep: 4 bins for CMS with mean F1 1.000

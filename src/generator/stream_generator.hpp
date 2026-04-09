@@ -62,7 +62,8 @@ struct AnomalySpec {
 
 struct GroundTruthEntry {
     std::string flow_id;
-    int         boundary;   // index e means epoch e → epoch e+1
+    int         boundary;
+    AnomalyType type;   // index e means epoch e → epoch e+1
 };
 
 struct GeneratedStream {
@@ -192,7 +193,7 @@ inline GeneratedStream generate_stream(
                         || (n0 == 0) != (n1 == 0)
                         || ((n0 > 0) && (n1 > 0) && std::abs(double(n0) - n1) / n0 > 0.01);
             if (changed)
-                result.ground_truth.push_back({key, b});
+                result.ground_truth.push_back({key, b, anom ? anom->type : AnomalyType::SuddenSpike});
         }
     }
 

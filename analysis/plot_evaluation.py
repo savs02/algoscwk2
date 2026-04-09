@@ -57,6 +57,50 @@ SKETCH_OFFSETS = {
 }
 
 
+
+def plot_baseline_vs_improved():
+    df = pd.read_csv(EVAL_DIR / "baseline_vs_improved.csv")
+    if df.empty:
+        return df
+
+    # We want to plot F1 score vs Sketch Type for EACH anomaly type.
+    # We will only use "improved_normalized" rows for the sketch comparisons.
+    # Wait, 7a asks for CMS vs CU-CMS vs CS comparison.
+    df = df[df["detector"] == "improved_normalized"]
+    
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=df, x="anomaly_type", y="f1", hue="sketch", palette="Set2")
+    plt.ylim(0, 1.05)
+    plt.title("F1 Score vs Sketch Type by Anomaly")
+    plt.ylabel("F1 Score")
+    plt.xlabel("Anomaly Type")
+    plt.legend(title="Sketch Type")
+    plt.tight_layout()
+    savefig("baseline_vs_improved.png")
+    return df
+
+
+def plot_baseline_vs_improved():
+    df = pd.read_csv(EVAL_DIR / "baseline_vs_improved.csv")
+    if df.empty:
+        return df
+
+    # We want to plot F1 score vs Sketch Type for EACH anomaly type.
+    # We will only use "improved_normalized" rows for the sketch comparisons.
+    # Wait, 7a asks for CMS vs CU-CMS vs CS comparison.
+    df = df[df["detector"] == "improved_normalized"]
+    
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=df, x="anomaly_type", y="f1", hue="sketch", palette="Set2")
+    plt.ylim(0, 1.05)
+    plt.title("F1 Score vs Sketch Type by Anomaly")
+    plt.ylabel("F1 Score")
+    plt.xlabel("Anomaly Type")
+    plt.legend(title="Sketch Type")
+    plt.tight_layout()
+    savefig("baseline_vs_improved.png")
+    return df
+
 def plot_threshold_sweep():
     df = pd.read_csv(EVAL_DIR / "threshold_sweep.csv")
     summary = aggregate(df, ["threshold"])
@@ -260,6 +304,8 @@ def main():
         "legend.edgecolor": "#cccccc",
     })
 
+    baseline_df = plot_baseline_vs_improved()
+    baseline_df = plot_baseline_vs_improved()
     threshold_summary = plot_threshold_sweep()
     savefig_name_bins = "appendix_bins_sweep.png"
     bins_summary = plot_line_sweep("bins_sweep.csv", "bins", "Bins Sweep", savefig_name_bins)

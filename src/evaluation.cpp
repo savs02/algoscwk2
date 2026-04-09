@@ -324,32 +324,39 @@ static void run_threshold_selection(const fs::path& out_dir,
     }
 
     std::ofstream summary_out(out_dir / "baseline_vs_improved.csv");
-    summary_out << "detector,sketch,seed,tp,fp,fn,precision,recall,f1\n";
+    summary_out << "detector,sketch,seed,anomaly_type,tp,fp,fn,precision,recall,f1\n";
 
-    auto baseline_stream = make_eval_stream(num_flows, num_epochs, epoch_size,
-                                            zipf_alpha, 2.0, 42);
     DetectorConfig baseline;
     baseline.raw_threshold = 300.0;
-    auto baseline_res = run_detection(SketchKind::CMS, width, depth, snapshots,
-                                      baseline_stream, cfg, baseline);
-    summary_out << "baseline_raw_l1,CMS,42,"
-                << baseline_res.tp << "," << baseline_res.fp << "," << baseline_res.fn
-                << "," << baseline_res.precision() << "," << baseline_res.recall()
-                << "," << baseline_res.f1() << "\n";
-
     DetectorConfig improved;
     improved.normalized = true;
     improved.ratio_threshold = best_threshold;
     improved.absolute_floor = abs_floor;
-    auto test_stream = make_eval_stream(num_flows, num_epochs, epoch_size,
-                                        zipf_alpha, 2.0, 44);
-    for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
-        auto res = run_detection(kind, width, depth, snapshots,
-                                 test_stream, cfg, improved);
-        summary_out << "improved_normalized," << sketch_name(kind) << ",44,"
-                    << res.tp << "," << res.fp << "," << res.fn << ","
-                    << res.precision() << "," << res.recall() << "," << res.f1()
-                    << "\n";
+
+    for (auto anom_type : {AnomalyType::SuddenSpike, AnomalyType::GradualRamp, 
+                           AnomalyType::PeriodicBurst, AnomalyType::Spread, 
+                           AnomalyType::Disappearance}) {
+        std::vector<AnomalySpec> single_anom = { {"1", anom_type, 1, 2.0} };
+        auto stream_a = generate_stream(num_flows, num_epochs, epoch_size, 
+                                        zipf_alpha, std::log(5.0), 0.5, single_anom, 42);
+        auto stream_b = generate_stream(num_flows, num_epochs, epoch_size, 
+                                        zipf_alpha, std::log(5.0), 0.5, single_anom, 44);
+
+        auto baseline_res = run_detection(SketchKind::CMS, width, depth, snapshots,
+                                          stream_a, cfg, baseline);
+        summary_out << "baseline_raw_l1,CMS,42," << anomaly_type_name(anom_type) << ","
+                    << baseline_res.tp << "," << baseline_res.fp << "," << baseline_res.fn
+                    << "," << baseline_res.precision() << "," << baseline_res.recall()
+                    << "," << baseline_res.f1() << "\n";
+
+        for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+            auto res = run_detection(kind, width, depth, snapshots,
+                                     stream_b, cfg, improved);
+            summary_out << "improved_normalized," << sketch_name(kind) << ",44," 
+                        << anomaly_type_name(anom_type) << ","
+                        << res.tp << "," << res.fp << "," << res.fn << ","
+                        << res.precision() << "," << res.recall() << "," << res.f1() << "\n";
+        }
     }
 
     std::cout << "Threshold sweep complete. Best validation threshold="
