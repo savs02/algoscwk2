@@ -1139,7 +1139,8 @@ static bool run_stage6() {
     std::cout << "\n--- Threshold selection (validation seeds 42-43) ---\n";
     std::cout << "Tuning normalised threshold on seeds 42-43 (avg F1 across 3 sketches):\n";
 
-    const std::vector<double> cand_thresholds = {0.10, 0.12, 0.15, 0.18, 0.20, 0.25};
+    const std::vector<double> cand_thresholds = {0.10, 0.15, 0.20, 0.25, 0.30,
+                                                 0.40, 0.50, 0.75, 1.00, 1.25, 1.50};
     double best_val_f1 = -1.0, best_thresh = 0.15;
     for (double cand : cand_thresholds) {
         double sum_f1 = 0.0;

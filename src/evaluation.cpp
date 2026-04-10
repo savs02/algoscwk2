@@ -75,6 +75,8 @@ struct DetectionResult {
     int tp = 0;
     int fp = 0;
     int fn = 0;
+    std::map<AnomalyType, int> tp_by_type;
+    std::map<AnomalyType, int> fn_by_type;
 
     double precision() const {
         return (tp + fp > 0) ? static_cast<double>(tp) / (tp + fp) : 0.0;
@@ -105,13 +107,17 @@ struct ClassificationCase {
     std::vector<std::tuple<double, std::string, double>> stream;
 };
 
-static std::vector<AnomalySpec> make_default_anomalies(double magnitude) {
+static std::vector<AnomalySpec> make_default_anomalies(double spike_magnitude) {
+    // Matches main.cpp Stage 6 exactly. Only SuddenSpike scales with the
+    // parameter so the sensitivity sweep still has a single knob to vary.
+    // GradualRamp/PeriodicBurst/Spread stay at their main.cpp defaults so
+    // every other sweep matches the Stage 6 baseline.
     return {
-        {"1", AnomalyType::SuddenSpike,   1, magnitude},
-        {"2", AnomalyType::GradualRamp,   1, magnitude},
-        {"3", AnomalyType::PeriodicBurst, 1, magnitude},
-        {"4", AnomalyType::Spread,        1, magnitude},
-        {"5", AnomalyType::Disappearance, 1, 1.0},
+        {"1", AnomalyType::SuddenSpike,   1, spike_magnitude},
+        {"2", AnomalyType::GradualRamp,   1, 1.2},
+        {"3", AnomalyType::PeriodicBurst, 1, 2.0},
+        {"4", AnomalyType::Spread,        1, 2.0},
+        {"5", AnomalyType::Disappearance, 1, 2.0},
     };
 }
 
@@ -131,8 +137,11 @@ static DetectionResult run_detection(
 
     EpochManager em(num_snapshots, factory);
     std::set<std::pair<std::string, int>> gt_set;
-    for (const auto& entry : gs.ground_truth)
+    std::map<std::pair<std::string, int>, AnomalyType> gt_type_map;
+    for (const auto& entry : gs.ground_truth) {
         gt_set.insert({entry.flow_id, entry.boundary});
+        gt_type_map[{entry.flow_id, entry.boundary}] = entry.type;
+    }
 
     std::set<std::pair<std::string, int>> detected_set;
     auto detect_boundary = [&](int boundary_idx) {
@@ -173,11 +182,19 @@ static DetectionResult run_detection(
 
     DetectionResult result;
     for (const auto& d : detected_set) {
-        if (gt_set.count(d)) ++result.tp;
-        else ++result.fp;
+        auto it = gt_type_map.find(d);
+        if (it != gt_type_map.end()) {
+            ++result.tp;
+            result.tp_by_type[it->second]++;
+        } else {
+            ++result.fp;
+        }
     }
     for (const auto& g : gt_set) {
-        if (!detected_set.count(g)) ++result.fn;
+        if (!detected_set.count(g)) {
+            ++result.fn;
+            result.fn_by_type[gt_type_map[g]]++;
+        }
     }
     return result;
 }
@@ -282,6 +299,11 @@ static void run_threshold_selection(const fs::path& out_dir,
                                     double& best_threshold,
                                     double& best_val_f1)
 {
+    // BUG FIX: must match run_baseline_vs_improved (Stage 6 setup). The
+    // optimal L1/baseline ratio depends on per-flow packet counts and the
+    // noise floor; tuning on a 10k-flow / 100k-packet stream and then
+    // applying the result to a 100-flow / 5k-packet stream produces a
+    // threshold that has no relationship to the data it is evaluated on.
     constexpr int num_flows = 100;
     constexpr int num_epochs = 4;
     constexpr int epoch_size = 5000;
@@ -295,11 +317,12 @@ static void run_threshold_selection(const fs::path& out_dir,
     BinConfig cfg(bins, 0.5, 200.0, BinScheme::Logarithmic);
     std::vector<uint32_t> val_seeds = {42, 43};
     std::vector<double> thresholds = {0.05, 0.10, 0.15, 0.20, 0.25,
-                                      0.30, 0.35, 0.40, 0.45, 0.50};
+                                      0.30, 0.35, 0.40, 0.45, 0.50,
+                                      0.60, 0.75, 1.00, 1.25, 1.50};
 
     std::ofstream sweep_out(out_dir / "threshold_sweep.csv");
-    sweep_out << "threshold,seed,f1\n";
-
+    sweep_out << "threshold,sketch,seed,f1\n";
+ 
     best_threshold = thresholds.front();
     best_val_f1 = -1.0;
     for (double threshold : thresholds) {
@@ -311,10 +334,13 @@ static void run_threshold_selection(const fs::path& out_dir,
             detector.normalized = true;
             detector.ratio_threshold = threshold;
             detector.absolute_floor = abs_floor;
-            auto res = run_detection(SketchKind::CMS, width, depth, snapshots,
-                                     gs, cfg, detector);
-            f1s.push_back(res.f1());
-            sweep_out << threshold << "," << seed << "," << res.f1() << "\n";
+            for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+                auto res = run_detection(kind, width, depth, snapshots,
+                                         gs, cfg, detector);
+                f1s.push_back(res.f1());
+                sweep_out << threshold << "," << sketch_name(kind) << ","
+                          << seed << "," << res.f1() << "\n";
+            }
         }
         const double avg_f1 = mean(f1s);
         if (avg_f1 > best_val_f1) {
@@ -323,38 +349,94 @@ static void run_threshold_selection(const fs::path& out_dir,
         }
     }
 
-    std::ofstream summary_out(out_dir / "baseline_vs_improved.csv");
-    summary_out << "detector,sketch,seed,tp,fp,fn,precision,recall,f1\n";
+    std::cout << "Threshold sweep complete. Best validation threshold="
+              << std::fixed << std::setprecision(2) << best_threshold
+              << " with mean val F1=" << best_val_f1 << "\n";
+}
 
-    auto baseline_stream = make_eval_stream(num_flows, num_epochs, epoch_size,
-                                            zipf_alpha, 2.0, 42);
+static void run_baseline_vs_improved(const fs::path& out_dir,
+                                     double best_threshold) {
+    // Reproduces the Stage 6 setup exactly: 100 Zipf flows, 4 epochs x 5000
+    // packets, all five anomalies present together, held-out seed 44.
+    constexpr int num_flows   = 100;
+    constexpr int num_epochs  = 4;
+    constexpr int epoch_size  = 5000;
+    constexpr int width       = 1024;
+    constexpr int depth       = 3;
+    constexpr int bins        = 10;
+    constexpr int snapshots   = 4;
+    constexpr double zipf_alpha = 1.5;
+    constexpr double abs_floor  = 30.0;
+    constexpr uint32_t test_seed = 44;
+
+    const std::vector<uint32_t> test_seeds = {44, 45, 46, 47, 48};
+
+    BinConfig cfg(bins, 0.5, 200.0, BinScheme::Logarithmic);
+    auto anomalies = make_default_anomalies(2.0);
+
     DetectorConfig baseline;
     baseline.raw_threshold = 300.0;
-    auto baseline_res = run_detection(SketchKind::CMS, width, depth, snapshots,
-                                      baseline_stream, cfg, baseline);
-    summary_out << "baseline_raw_l1,CMS,42,"
-                << baseline_res.tp << "," << baseline_res.fp << "," << baseline_res.fn
-                << "," << baseline_res.precision() << "," << baseline_res.recall()
-                << "," << baseline_res.f1() << "\n";
 
     DetectorConfig improved;
     improved.normalized = true;
     improved.ratio_threshold = best_threshold;
     improved.absolute_floor = abs_floor;
-    auto test_stream = make_eval_stream(num_flows, num_epochs, epoch_size,
-                                        zipf_alpha, 2.0, 44);
-    for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
-        auto res = run_detection(kind, width, depth, snapshots,
-                                 test_stream, cfg, improved);
-        summary_out << "improved_normalized," << sketch_name(kind) << ",44,"
-                    << res.tp << "," << res.fp << "," << res.fn << ","
-                    << res.precision() << "," << res.recall() << "," << res.f1()
-                    << "\n";
+
+    std::ofstream overall_out(out_dir / "baseline_vs_improved.csv");
+    overall_out << "detector,sketch,seed,anomaly_type,tp,fp,fn,"
+                   "precision,recall,f1\n";
+
+    std::ofstream per_type_out(out_dir / "per_type_breakdown.csv");
+    per_type_out << "detector,sketch,seed,anomaly_type,tp,fn,recall\n";
+
+    struct Run { const char* name; const DetectorConfig* cfg; };
+    const std::vector<Run> runs = {
+        {"baseline_raw_l1",    &baseline},
+        {"improved_normalized", &improved},
+    };
+
+    // Collect every anomaly type that appears in GT so per-type rows are
+    // emitted even for types with 0 TPs and 0 FNs (keeps the CSV rectangular).
+    std::set<AnomalyType> all_types;
+    {
+        auto probe = generate_stream(num_flows, num_epochs, epoch_size,
+                                     zipf_alpha, std::log(5.0), 0.5,
+                                     anomalies, test_seeds.front());
+        for (const auto& entry : probe.ground_truth)
+            all_types.insert(entry.type);
     }
 
-    std::cout << "Threshold sweep complete. Best validation threshold="
-              << std::fixed << std::setprecision(2) << best_threshold
-              << " with mean val F1=" << best_val_f1 << "\n";
+    for (uint32_t seed : test_seeds) {
+        auto gs = generate_stream(num_flows, num_epochs, epoch_size,
+                                  zipf_alpha, std::log(5.0), 0.5,
+                                  anomalies, seed);
+        for (const auto& run : runs) {
+            for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+                auto res = run_detection(kind, width, depth, snapshots,
+                                         gs, cfg, *run.cfg);
+
+                overall_out << run.name << "," << sketch_name(kind) << ","
+                            << seed << ",ALL,"
+                            << res.tp << "," << res.fp << "," << res.fn << ","
+                            << res.precision() << "," << res.recall() << ","
+                            << res.f1() << "\n";
+
+                for (AnomalyType type : all_types) {
+                    const int tp_c = res.tp_by_type.count(type) ? res.tp_by_type.at(type) : 0;
+                    const int fn_c = res.fn_by_type.count(type) ? res.fn_by_type.at(type) : 0;
+                    const double rec = (tp_c + fn_c > 0)
+                        ? static_cast<double>(tp_c) / (tp_c + fn_c) : 0.0;
+                    per_type_out << run.name << "," << sketch_name(kind) << ","
+                                 << seed << "," << anomaly_type_name(type) << ","
+                                 << tp_c << "," << fn_c << "," << rec << "\n";
+                }
+            }
+        }
+    }
+
+    std::cout << "Baseline-vs-improved across " << test_seeds.size()
+              << " held-out seeds written to baseline_vs_improved.csv "
+              << "and per_type_breakdown.csv\n";
 }
 
 static void run_bins_sweep(const fs::path& out_dir, const DetectorConfig& detector) {
@@ -363,6 +445,8 @@ static void run_bins_sweep(const fs::path& out_dir, const DetectorConfig& detect
     constexpr int base_bins = 10;
     constexpr int snapshots = 4;
     constexpr int base_snapshots = 4;
+    // BUG FIX: align with the rest of the evaluation (Stage 6 scale) so this
+    // sweep is comparable to memory_sweep, zipf_sweep, sensitivity_sweep, etc.
     constexpr int num_flows = 100;
     constexpr int num_epochs = 4;
     constexpr int epoch_size = 5000;
@@ -389,12 +473,62 @@ static void run_bins_sweep(const fs::path& out_dir, const DetectorConfig& detect
     }
 }
 
+static void run_memory_sweep(const fs::path& out_dir, const DetectorConfig& detector) {
+    // Fix everything except width. This isolates the memory/accuracy tradeoff
+    // from the confounds that bins_sweep and snapshots_sweep introduce
+    // (those reduce width as a function of bins/K to hold total memory fixed).
+    constexpr int depth      = 3;
+    constexpr int bins       = 10;
+    constexpr int snapshots  = 4;
+    constexpr int num_flows  = 100;
+    constexpr int num_epochs = 4;
+    constexpr int epoch_size = 5000;
+    constexpr double zipf_alpha = 1.5;
+
+    BinConfig cfg(bins, 0.5, 200.0, BinScheme::Logarithmic);
+    const std::vector<uint32_t> seeds = {44, 45, 46, 47, 48};
+    const std::vector<int> widths = {32, 64, 128, 256, 512, 1024};
+
+    std::ofstream out(out_dir / "memory_sweep.csv");
+    out << "sketch,width,memory_bytes,seed,tp,fp,fn,f1\n";
+
+    for (int width : widths) {
+        // Per-snapshot memory; total across K snapshots = this * snapshots.
+        // counter size = 4 bytes (int32_t), matching the rest of the repo.
+        const long mem_bytes =
+            static_cast<long>(width) * depth * bins * 4 * snapshots;
+
+        for (uint32_t seed : seeds) {
+            auto gs = make_eval_stream(num_flows, num_epochs, epoch_size,
+                                       zipf_alpha, 2.0, seed);
+            for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+                auto res = run_detection(kind, width, depth, snapshots,
+                                         gs, cfg, detector);
+                out << sketch_name(kind) << "," << width << ","
+                    << mem_bytes << "," << seed << ","
+                    << res.tp << "," << res.fp << "," << res.fn << ","
+                    << res.f1() << "\n";
+            }
+        }
+    }
+}
+
 static void run_snapshots_sweep(const fs::path& out_dir, const DetectorConfig& detector) {
     constexpr int base_width = 1024;
     constexpr int depth = 3;
     constexpr int bins = 10;
     constexpr int base_bins = 10;
     constexpr int base_snapshots = 4;
+    // BUG FIX: align with Stage 6 scale (see bins_sweep).
+    //
+    // CAVEAT (not a code bug, but worth flagging in the report): with
+    // num_epochs fixed at 4 and detection only ever diffing adjacent epochs,
+    // increasing K beyond 2 allocates ring-buffer slots that are never read.
+    // The width-for-budget formula then shrinks `width` as K grows, so this
+    // sweep effectively measures F1 vs width under a different label —
+    // memory_sweep already does that more cleanly. To make this experiment
+    // genuinely about K, num_epochs would need to grow with K and the
+    // detector would need to use older snapshots.
     constexpr int num_flows = 100;
     constexpr int epoch_size = 5000;
     constexpr double zipf_alpha = 1.5;
@@ -416,6 +550,39 @@ static void run_snapshots_sweep(const fs::path& out_dir, const DetectorConfig& d
                 out << sketch_name(kind) << "," << snapshots << "," << width << ","
                     << seed << "," << res.tp << "," << res.fp << ","
                     << res.fn << "," << res.f1() << "\n";
+            }
+        }
+    }
+}
+
+// NEW: epoch size sensitivity (Task 4 from PROJECT_GUIDE.md). Shows the
+// minimum viable per-epoch packet budget for reliable detection. Sweeps
+// epoch_size while holding num_flows, num_epochs, and the detector fixed.
+static void run_epoch_sweep(const fs::path& out_dir, const DetectorConfig& detector) {
+    constexpr int width = 1024;
+    constexpr int depth = 3;
+    constexpr int bins = 10;
+    constexpr int snapshots = 4;
+    constexpr int num_flows = 100;
+    constexpr int num_epochs = 4;
+    constexpr double zipf_alpha = 1.5;
+    const std::vector<uint32_t> seeds = {42, 43, 44};
+    const std::vector<int> epoch_sizes = {500, 1000, 2000, 5000, 10000};
+
+    BinConfig cfg(bins, 0.5, 200.0, BinScheme::Logarithmic);
+    std::ofstream out(out_dir / "epoch_sweep.csv");
+    out << "sketch,epoch_size,seed,tp,fp,fn,f1\n";
+
+    for (int epoch_size : epoch_sizes) {
+        for (uint32_t seed : seeds) {
+            auto gs = make_eval_stream(num_flows, num_epochs, epoch_size,
+                                       zipf_alpha, 2.0, seed);
+            for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+                auto res = run_detection(kind, width, depth, snapshots,
+                                         gs, cfg, detector);
+                out << sketch_name(kind) << "," << epoch_size << "," << seed << ","
+                    << res.tp << "," << res.fp << "," << res.fn << ","
+                    << res.f1() << "\n";
             }
         }
     }
@@ -457,7 +624,7 @@ static void run_sensitivity_sweep(const fs::path& out_dir, const DetectorConfig&
     std::ofstream out(out_dir / "sensitivity_sweep.csv");
     out << "sketch,magnitude,seed,tp,fp,fn,f1\n";
 
-    for (double magnitude : {1.1, 1.2, 1.5, 2.0, 5.0}) {
+    for (double magnitude : {1.1, 1.2, 1.3, 1.4, 1.5, 2.0, 5.0}) {
         for (uint32_t seed : seeds) {
             auto gs = make_eval_stream(100, 4, 5000, zipf_alpha, magnitude, seed);
             for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
@@ -504,8 +671,8 @@ static void run_hash_rotation_experiment(const fs::path& out_dir) {
     constexpr int width = 64;
     constexpr int depth = 3;
     constexpr int bins = 10;
-    constexpr int num_flows = 200;
-    constexpr int n_items = 20000;
+    constexpr int num_flows = 10000;
+    constexpr int n_items = 100000;
     constexpr double zipf_alpha = 1.5;
     const double mu = std::log(5.0);
     constexpr double sigma = 0.5;
@@ -515,8 +682,7 @@ static void run_hash_rotation_experiment(const fs::path& out_dir) {
     out << "sketch,flow,mean_l1,std_l1\n";
 
     for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
-        std::vector<double> flow1_l1;
-        std::vector<double> flow10_l1;
+        std::vector<double> flow1_l1, flow10_l1, flow100_l1, flow1000_l1, flow10000_l1;
 
         for (uint32_t pair_seed = 0; pair_seed < 10; ++pair_seed) {
             std::mt19937 rng(1000 + pair_seed);
@@ -535,12 +701,21 @@ static void run_hash_rotation_experiment(const fs::path& out_dir) {
 
             flow1_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "1")).l1);
             flow10_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "10")).l1);
+            flow100_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "100")).l1);
+            flow1000_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "1000")).l1);
+            flow10000_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "10000")).l1);
         }
 
         out << sketch_name(kind) << ",1," << mean(flow1_l1) << ","
             << stdev(flow1_l1) << "\n";
         out << sketch_name(kind) << ",10," << mean(flow10_l1) << ","
             << stdev(flow10_l1) << "\n";
+        out << sketch_name(kind) << ",100," << mean(flow100_l1) << ","
+            << stdev(flow100_l1) << "\n";
+        out << sketch_name(kind) << ",1000," << mean(flow1000_l1) << ","
+            << stdev(flow1000_l1) << "\n";
+        out << sketch_name(kind) << ",10000," << mean(flow10000_l1) << ","
+            << stdev(flow10000_l1) << "\n";
     }
 }
 
@@ -704,6 +879,7 @@ int main() {
     double best_threshold = 0.25;
     double best_val_f1 = 0.0;
     run_threshold_selection(out_dir, best_threshold, best_val_f1);
+    run_baseline_vs_improved(out_dir, best_threshold);
 
     DetectorConfig improved;
     improved.normalized = true;
@@ -712,11 +888,13 @@ int main() {
 
     run_bins_sweep(out_dir, improved);
     run_snapshots_sweep(out_dir, improved);
+    run_memory_sweep(out_dir, improved);   
     run_zipf_sweep(out_dir, improved);
     run_sensitivity_sweep(out_dir, improved);
     run_bin_scheme_comparison(out_dir, improved);
     run_hash_rotation_experiment(out_dir);
     run_classification_evaluation(out_dir);
+    run_epoch_sweep(out_dir, improved);
 
     std::cout << "Generated:\n";
     std::cout << "  outputs/evaluation/histogram_accuracy.csv\n";
@@ -730,5 +908,8 @@ int main() {
     std::cout << "  outputs/evaluation/hash_rotation.csv\n";
     std::cout << "  outputs/evaluation/classifier_accuracy_vs_n.csv\n";
     std::cout << "  outputs/evaluation/classifier_confusion_matrix.csv\n";
+    std::cout << "  outputs/evaluation/per_type_breakdown.csv\n";
+    std::cout << "  outputs/evaluation/memory_sweep.csv\n";
+    std::cout << "  outputs/evaluation/epoch_sweep.csv\n";
     return 0;
 }
