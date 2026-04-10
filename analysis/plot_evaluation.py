@@ -249,7 +249,7 @@ def plot_threshold_sweep():
     return summary
 
 
-def draw_sketch_lines(summary, x_col, title, out_name, y_label, ylim=(0, 1.05)):
+def draw_sketch_lines(summary, x_col, title, out_name, y_label, ylim=(0, 1.05), legend_kwargs=None):
     x_values = sorted(summary[x_col].unique())
     x_positions = {value: idx for idx, value in enumerate(x_values)}
 
@@ -283,8 +283,9 @@ def draw_sketch_lines(summary, x_col, title, out_name, y_label, ylim=(0, 1.05)):
     ax.set_ylabel(y_label)
     ax.set_xlabel(x_col.replace("_", " ").title())
     ax.set_title(title)
-    ax.legend(title="Sketch", ncol=3, frameon=True, loc="upper center",
-              bbox_to_anchor=(0.5, 1.18))
+    if legend_kwargs is None:
+        legend_kwargs = dict(title="Sketch", ncol=3, frameon=True, loc="upper center", bbox_to_anchor=(0.5, 1.18))
+    ax.legend(**legend_kwargs)
     ax.grid(axis="y", alpha=0.25)
     ax.set_axisbelow(True)
     savefig(out_name)
@@ -301,7 +302,8 @@ def plot_bin_scheme():
     df = pd.read_csv(EVAL_DIR / "bin_scheme_comparison.csv")
     summary = aggregate(df, ["sketch", "scheme"])
     draw_sketch_lines(summary, "scheme", "Uniform vs Logarithmic Bins",
-                      "bin_scheme_comparison.png", "Mean F1")
+                      "bin_scheme_comparison.png", "Mean F1",
+                      legend_kwargs=dict(title="Sketch", loc="lower left", fontsize="small", title_fontsize="small"))
     return summary
 
 
