@@ -128,7 +128,6 @@ def plot_memory_sweep():
         )
 
     ax.set_xscale("log", base=2)
-    ax.set_ylim(0, 1.05)
     ax.set_xlabel("Total memory (KB, log scale) — width × depth × bins × snapshots × 4B")
     ax.set_ylabel("F1 Score")
     ax.set_title("Memory vs F1 Tradeoff (5 held-out seeds, improved detector)")
