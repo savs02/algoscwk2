@@ -291,10 +291,10 @@ def draw_sketch_lines(summary, x_col, title, out_name, y_label, ylim=(0, 1.05), 
     savefig(out_name)
 
 
-def plot_line_sweep(csv_name, x_col, title, out_name, ylim=(0, 1.05)):
+def plot_line_sweep(csv_name, x_col, title, out_name, ylim=(0, 1.05), legend_kwargs=None):
     df = pd.read_csv(EVAL_DIR / csv_name)
     summary = aggregate(df, ["sketch", x_col])
-    draw_sketch_lines(summary, x_col, title, out_name, "Mean F1", ylim=ylim)
+    draw_sketch_lines(summary, x_col, title, out_name, "Mean F1", ylim=ylim, legend_kwargs=legend_kwargs)
     return summary
 
 
@@ -485,13 +485,17 @@ def main():
     baseline_df = plot_baseline_vs_improved()
     per_type_df = plot_per_type_breakdown()
     threshold_summary = plot_threshold_sweep()
+    
+    sweep_legend_kwargs = dict(title="Sketch", loc="lower left", fontsize="small", title_fontsize="small")
+    
     savefig_name_bins = "appendix_bins_sweep.png"
-    bins_summary = plot_line_sweep("bins_sweep.csv", "bins", "Bins Sweep", savefig_name_bins, ylim=None)
+    bins_summary = plot_line_sweep("bins_sweep.csv", "bins", "Bins Sweep", savefig_name_bins, ylim=None, legend_kwargs=sweep_legend_kwargs)
     snapshots_summary = plot_line_sweep(
-        "snapshots_sweep.csv", "snapshots", "Snapshots Sweep", "appendix_snapshots_sweep.png", ylim=None
+        "snapshots_sweep.csv", "snapshots", "Snapshots Sweep", "appendix_snapshots_sweep.png", ylim=None, legend_kwargs=sweep_legend_kwargs
     )
+    zipf_legend_kwargs = dict(title="Sketch", loc="lower right", fontsize="small", title_fontsize="small")
     zipf_summary = plot_line_sweep(
-        "zipf_sweep.csv", "zipf_alpha", "Zipf Sweep", "appendix_zipf_sweep.png", ylim=None
+        "zipf_sweep.csv", "zipf_alpha", "Zipf Sweep", "appendix_zipf_sweep.png", ylim=None, legend_kwargs=zipf_legend_kwargs
     )
     sensitivity_summary = plot_line_sweep(
         "sensitivity_sweep.csv", "magnitude", "Sensitivity Sweep", "sensitivity_sweep.png", ylim=None
