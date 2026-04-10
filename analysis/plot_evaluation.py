@@ -232,7 +232,7 @@ def plot_threshold_sweep():
     df = pd.read_csv(EVAL_DIR / "threshold_sweep.csv")
     # Average over sketch and seed at each threshold.
     summary = aggregate(df, ["threshold"])
-    plt.figure(figsize=(8, 4.8))
+    plt.figure(figsize=(8, 6.0))
     plt.plot(summary["threshold"], summary["mean"], color="#0f4c5c",
              marker="o", linewidth=2.5, markersize=7)
     plt.fill_between(summary["threshold"],
@@ -241,7 +241,7 @@ def plot_threshold_sweep():
                      alpha=0.18,
                      color="#0f4c5c")
     plt.ylim(0, 1.05)
-    plt.ylabel("Validation F1 (mean over 3 sketches × 2 seeds)")
+    plt.ylabel("Validation F1\n(mean over 3 sketches × 2 seeds)")
     plt.xlabel("Normalized L1 Threshold")
     plt.title("Threshold Selection")
     plt.grid(axis="y", alpha=0.25)
