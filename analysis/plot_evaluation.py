@@ -301,9 +301,27 @@ def plot_line_sweep(csv_name, x_col, title, out_name, ylim=(0, 1.05), legend_kwa
 def plot_bin_scheme():
     df = pd.read_csv(EVAL_DIR / "bin_scheme_comparison.csv")
     summary = aggregate(df, ["sketch", "scheme"])
-    draw_sketch_lines(summary, "scheme", "Uniform vs Logarithmic Bins",
-                      "bin_scheme_comparison.png", "Mean F1",
-                      legend_kwargs=dict(title="Sketch", loc="lower left", fontsize="small", title_fontsize="small"))
+    
+    plt.figure(figsize=(8.4, 4.8))
+    sns.barplot(
+        data=df,
+        x="scheme",
+        y="f1",
+        hue="sketch",
+        hue_order=SKETCH_ORDER,
+        errorbar="sd",
+        capsize=0.1,
+        err_kws={"linewidth": 1.2},
+        palette=SKETCH_COLORS,
+    )
+    plt.ylim(0, 1.05)
+    plt.ylabel("Mean F1")
+    plt.xlabel("Scheme")
+    plt.title("Uniform vs Logarithmic Bins")
+    plt.legend(title="Sketch", loc="upper left", fontsize="small", title_fontsize="small")
+    plt.grid(axis="y", alpha=0.25)
+    plt.gca().set_axisbelow(True)
+    savefig("bin_scheme_comparison.png")
     return summary
 
 
