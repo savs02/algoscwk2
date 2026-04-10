@@ -514,11 +514,13 @@ def main():
     zipf_summary = plot_line_sweep(
         "zipf_sweep.csv", "zipf_alpha", "Zipf Sweep", "appendix_zipf_sweep.png", ylim=None, legend_kwargs=zipf_legend_kwargs
     )
+    
+    mid_legend_kwargs = dict(title="Sketch", loc="lower center", fontsize="small", title_fontsize="small")
     sensitivity_summary = plot_line_sweep(
-        "sensitivity_sweep.csv", "magnitude", "Sensitivity Sweep", "sensitivity_sweep.png", ylim=None
+        "sensitivity_sweep.csv", "magnitude", "Sensitivity Sweep", "sensitivity_sweep.png", ylim=None, legend_kwargs=mid_legend_kwargs
     )
     epoch_summary = plot_line_sweep(
-        "epoch_sweep.csv", "epoch_size", "Epoch Size Sweep", "epoch_sweep.png", ylim=None
+        "epoch_sweep.csv", "epoch_size", "Epoch Size Sweep", "epoch_sweep.png", ylim=None, legend_kwargs=mid_legend_kwargs
     )
 
     memory_summary = plot_memory_sweep()   # add this line
