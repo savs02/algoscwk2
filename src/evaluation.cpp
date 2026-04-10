@@ -107,13 +107,17 @@ struct ClassificationCase {
     std::vector<std::tuple<double, std::string, double>> stream;
 };
 
-static std::vector<AnomalySpec> make_default_anomalies(double magnitude) {
+static std::vector<AnomalySpec> make_default_anomalies(double spike_magnitude) {
+    // Matches main.cpp Stage 6 exactly. Only SuddenSpike scales with the
+    // parameter so the sensitivity sweep still has a single knob to vary.
+    // GradualRamp/PeriodicBurst/Spread stay at their main.cpp defaults so
+    // every other sweep matches the Stage 6 baseline.
     return {
-        {"1", AnomalyType::SuddenSpike,   1, magnitude},
-        {"2", AnomalyType::GradualRamp,   1, magnitude},
-        {"3", AnomalyType::PeriodicBurst, 1, magnitude},
-        {"4", AnomalyType::Spread,        1, magnitude},
-        {"5", AnomalyType::Disappearance, 1, 1.0},
+        {"1", AnomalyType::SuddenSpike,   1, spike_magnitude},
+        {"2", AnomalyType::GradualRamp,   1, 1.2},
+        {"3", AnomalyType::PeriodicBurst, 1, 2.0},
+        {"4", AnomalyType::Spread,        1, 2.0},
+        {"5", AnomalyType::Disappearance, 1, 2.0},
     };
 }
 
