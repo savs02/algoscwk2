@@ -250,7 +250,7 @@ def plot_threshold_sweep():
     return summary
 
 
-def draw_sketch_lines(summary, x_col, title, out_name, y_label):
+def draw_sketch_lines(summary, x_col, title, out_name, y_label, ylim=(0, 1.05)):
     x_values = sorted(summary[x_col].unique())
     x_positions = {value: idx for idx, value in enumerate(x_values)}
 
@@ -279,7 +279,8 @@ def draw_sketch_lines(summary, x_col, title, out_name, y_label):
 
     ax.set_xticks(list(x_positions.values()))
     ax.set_xticklabels([str(v) for v in x_values])
-    ax.set_ylim(0, 1.05)
+    if ylim is not None:
+        ax.set_ylim(ylim[0], ylim[1])
     ax.set_ylabel(y_label)
     ax.set_xlabel(x_col.replace("_", " ").title())
     ax.set_title(title)
@@ -290,10 +291,10 @@ def draw_sketch_lines(summary, x_col, title, out_name, y_label):
     savefig(out_name)
 
 
-def plot_line_sweep(csv_name, x_col, title, out_name):
+def plot_line_sweep(csv_name, x_col, title, out_name, ylim=(0, 1.05)):
     df = pd.read_csv(EVAL_DIR / csv_name)
     summary = aggregate(df, ["sketch", x_col])
-    draw_sketch_lines(summary, x_col, title, out_name, "Mean F1")
+    draw_sketch_lines(summary, x_col, title, out_name, "Mean F1", ylim=ylim)
     return summary
 
 
@@ -484,18 +485,18 @@ def main():
     per_type_df = plot_per_type_breakdown()
     threshold_summary = plot_threshold_sweep()
     savefig_name_bins = "appendix_bins_sweep.png"
-    bins_summary = plot_line_sweep("bins_sweep.csv", "bins", "Bins Sweep", savefig_name_bins)
+    bins_summary = plot_line_sweep("bins_sweep.csv", "bins", "Bins Sweep", savefig_name_bins, ylim=None)
     snapshots_summary = plot_line_sweep(
-        "snapshots_sweep.csv", "snapshots", "Snapshots Sweep", "appendix_snapshots_sweep.png"
+        "snapshots_sweep.csv", "snapshots", "Snapshots Sweep", "appendix_snapshots_sweep.png", ylim=None
     )
     zipf_summary = plot_line_sweep(
-        "zipf_sweep.csv", "zipf_alpha", "Zipf Sweep", "appendix_zipf_sweep.png"
+        "zipf_sweep.csv", "zipf_alpha", "Zipf Sweep", "appendix_zipf_sweep.png", ylim=None
     )
     sensitivity_summary = plot_line_sweep(
-        "sensitivity_sweep.csv", "magnitude", "Sensitivity Sweep", "sensitivity_sweep.png"
+        "sensitivity_sweep.csv", "magnitude", "Sensitivity Sweep", "sensitivity_sweep.png", ylim=None
     )
     epoch_summary = plot_line_sweep(
-        "epoch_sweep.csv", "epoch_size", "Epoch Size Sweep", "epoch_sweep.png"
+        "epoch_sweep.csv", "epoch_size", "Epoch Size Sweep", "epoch_sweep.png", ylim=None
     )
 
     memory_summary = plot_memory_sweep()   # add this line
