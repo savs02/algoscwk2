@@ -105,7 +105,7 @@ def plot_memory_sweep():
     summary["std"] = summary["std"].fillna(0.0)
     summary["memory_kb"] = summary["memory_bytes"] / 1024.0
 
-    plt.figure(figsize=(8.4, 5.0))
+    plt.figure(figsize=(12.5, 6.5))
     ax = plt.gca()
     for sketch in SKETCH_ORDER:
         sub = summary[summary["sketch"] == sketch].sort_values("width")
