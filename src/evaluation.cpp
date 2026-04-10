@@ -75,6 +75,8 @@ struct DetectionResult {
     int tp = 0;
     int fp = 0;
     int fn = 0;
+    std::map<AnomalyType, int> tp_by_type;
+    std::map<AnomalyType, int> fn_by_type;
 
     double precision() const {
         return (tp + fp > 0) ? static_cast<double>(tp) / (tp + fp) : 0.0;
@@ -131,8 +133,11 @@ static DetectionResult run_detection(
 
     EpochManager em(num_snapshots, factory);
     std::set<std::pair<std::string, int>> gt_set;
-    for (const auto& entry : gs.ground_truth)
+    std::map<std::pair<std::string, int>, AnomalyType> gt_type_map;
+    for (const auto& entry : gs.ground_truth) {
         gt_set.insert({entry.flow_id, entry.boundary});
+        gt_type_map[{entry.flow_id, entry.boundary}] = entry.type;
+    }
 
     std::set<std::pair<std::string, int>> detected_set;
     auto detect_boundary = [&](int boundary_idx) {
@@ -173,11 +178,19 @@ static DetectionResult run_detection(
 
     DetectionResult result;
     for (const auto& d : detected_set) {
-        if (gt_set.count(d)) ++result.tp;
-        else ++result.fp;
+        auto it = gt_type_map.find(d);
+        if (it != gt_type_map.end()) {
+            ++result.tp;
+            result.tp_by_type[it->second]++;
+        } else {
+            ++result.fp;
+        }
     }
     for (const auto& g : gt_set) {
-        if (!detected_set.count(g)) ++result.fn;
+        if (!detected_set.count(g)) {
+            ++result.fn;
+            result.fn_by_type[gt_type_map[g]]++;
+        }
     }
     return result;
 }
@@ -323,45 +336,94 @@ static void run_threshold_selection(const fs::path& out_dir,
         }
     }
 
-    std::ofstream summary_out(out_dir / "baseline_vs_improved.csv");
-    summary_out << "detector,sketch,seed,anomaly_type,tp,fp,fn,precision,recall,f1\n";
+    std::cout << "Threshold sweep complete. Best validation threshold="
+              << std::fixed << std::setprecision(2) << best_threshold
+              << " with mean val F1=" << best_val_f1 << "\n";
+}
+
+static void run_baseline_vs_improved(const fs::path& out_dir,
+                                     double best_threshold) {
+    // Reproduces the Stage 6 setup exactly: 100 Zipf flows, 4 epochs x 5000
+    // packets, all five anomalies present together, held-out seed 44.
+    constexpr int num_flows   = 100;
+    constexpr int num_epochs  = 4;
+    constexpr int epoch_size  = 5000;
+    constexpr int width       = 1024;
+    constexpr int depth       = 3;
+    constexpr int bins        = 10;
+    constexpr int snapshots   = 4;
+    constexpr double zipf_alpha = 1.5;
+    constexpr double abs_floor  = 30.0;
+    constexpr uint32_t test_seed = 44;
+
+    const std::vector<uint32_t> test_seeds = {44, 45, 46, 47, 48};
+
+    BinConfig cfg(bins, 0.5, 200.0, BinScheme::Logarithmic);
+    auto anomalies = make_default_anomalies(2.0);
 
     DetectorConfig baseline;
     baseline.raw_threshold = 300.0;
+
     DetectorConfig improved;
     improved.normalized = true;
     improved.ratio_threshold = best_threshold;
     improved.absolute_floor = abs_floor;
 
-    for (auto anom_type : {AnomalyType::SuddenSpike, AnomalyType::GradualRamp, 
-                           AnomalyType::PeriodicBurst, AnomalyType::Spread, 
-                           AnomalyType::Disappearance}) {
-        std::vector<AnomalySpec> single_anom = { {"1", anom_type, 1, 2.0} };
-        auto stream_a = generate_stream(num_flows, num_epochs, epoch_size, 
-                                        zipf_alpha, std::log(5.0), 0.5, single_anom, 42);
-        auto stream_b = generate_stream(num_flows, num_epochs, epoch_size, 
-                                        zipf_alpha, std::log(5.0), 0.5, single_anom, 44);
+    std::ofstream overall_out(out_dir / "baseline_vs_improved.csv");
+    overall_out << "detector,sketch,seed,anomaly_type,tp,fp,fn,"
+                   "precision,recall,f1\n";
 
-        auto baseline_res = run_detection(SketchKind::CMS, width, depth, snapshots,
-                                          stream_a, cfg, baseline);
-        summary_out << "baseline_raw_l1,CMS,42," << anomaly_type_name(anom_type) << ","
-                    << baseline_res.tp << "," << baseline_res.fp << "," << baseline_res.fn
-                    << "," << baseline_res.precision() << "," << baseline_res.recall()
-                    << "," << baseline_res.f1() << "\n";
+    std::ofstream per_type_out(out_dir / "per_type_breakdown.csv");
+    per_type_out << "detector,sketch,seed,anomaly_type,tp,fn,recall\n";
 
-        for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
-            auto res = run_detection(kind, width, depth, snapshots,
-                                     stream_b, cfg, improved);
-            summary_out << "improved_normalized," << sketch_name(kind) << ",44," 
-                        << anomaly_type_name(anom_type) << ","
-                        << res.tp << "," << res.fp << "," << res.fn << ","
-                        << res.precision() << "," << res.recall() << "," << res.f1() << "\n";
+    struct Run { const char* name; const DetectorConfig* cfg; };
+    const std::vector<Run> runs = {
+        {"baseline_raw_l1",    &baseline},
+        {"improved_normalized", &improved},
+    };
+
+    // Collect every anomaly type that appears in GT so per-type rows are
+    // emitted even for types with 0 TPs and 0 FNs (keeps the CSV rectangular).
+    std::set<AnomalyType> all_types;
+    {
+        auto probe = generate_stream(num_flows, num_epochs, epoch_size,
+                                     zipf_alpha, std::log(5.0), 0.5,
+                                     anomalies, test_seeds.front());
+        for (const auto& entry : probe.ground_truth)
+            all_types.insert(entry.type);
+    }
+
+    for (uint32_t seed : test_seeds) {
+        auto gs = generate_stream(num_flows, num_epochs, epoch_size,
+                                  zipf_alpha, std::log(5.0), 0.5,
+                                  anomalies, seed);
+        for (const auto& run : runs) {
+            for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+                auto res = run_detection(kind, width, depth, snapshots,
+                                         gs, cfg, *run.cfg);
+
+                overall_out << run.name << "," << sketch_name(kind) << ","
+                            << seed << ",ALL,"
+                            << res.tp << "," << res.fp << "," << res.fn << ","
+                            << res.precision() << "," << res.recall() << ","
+                            << res.f1() << "\n";
+
+                for (AnomalyType type : all_types) {
+                    const int tp_c = res.tp_by_type.count(type) ? res.tp_by_type.at(type) : 0;
+                    const int fn_c = res.fn_by_type.count(type) ? res.fn_by_type.at(type) : 0;
+                    const double rec = (tp_c + fn_c > 0)
+                        ? static_cast<double>(tp_c) / (tp_c + fn_c) : 0.0;
+                    per_type_out << run.name << "," << sketch_name(kind) << ","
+                                 << seed << "," << anomaly_type_name(type) << ","
+                                 << tp_c << "," << fn_c << "," << rec << "\n";
+                }
+            }
         }
     }
 
-    std::cout << "Threshold sweep complete. Best validation threshold="
-              << std::fixed << std::setprecision(2) << best_threshold
-              << " with mean val F1=" << best_val_f1 << "\n";
+    std::cout << "Baseline-vs-improved across " << test_seeds.size()
+              << " held-out seeds written to baseline_vs_improved.csv "
+              << "and per_type_breakdown.csv\n";
 }
 
 static void run_bins_sweep(const fs::path& out_dir, const DetectorConfig& detector) {
@@ -711,6 +773,7 @@ int main() {
     double best_threshold = 0.25;
     double best_val_f1 = 0.0;
     run_threshold_selection(out_dir, best_threshold, best_val_f1);
+    run_baseline_vs_improved(out_dir, best_threshold);
 
     DetectorConfig improved;
     improved.normalized = true;
@@ -737,5 +800,6 @@ int main() {
     std::cout << "  outputs/evaluation/hash_rotation.csv\n";
     std::cout << "  outputs/evaluation/classifier_accuracy_vs_n.csv\n";
     std::cout << "  outputs/evaluation/classifier_confusion_matrix.csv\n";
+    std::cout << "  outputs/evaluation/per_type_breakdown.csv\n";
     return 0;
 }

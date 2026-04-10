@@ -1,10 +1,13 @@
 # Evaluation Summary
 
-## Detector
-- Baseline raw L1 F1: 0.800
-- Improved normalized detector best threshold: 0.50
-- Best validation mean F1: 0.900
-- Held-out improved F1 (all sketches): 0.647
+## Detector (5 held-out seeds, all 5 anomalies together)
+- Baseline raw L1: F1 = 0.875 ± 0.000
+- Improved normalized: F1 = 0.979 ± 0.027
+- Best validation threshold: 0.50 (val mean F1 0.900)
+
+## Per-type recall (mean across 3 sketches)
+- Baseline hardest type: Disappearance (recall 0.000)
+- Improved hardest type: Disappearance (recall 1.000)
 
 ## Sweeps
 - Best bins setting in current sweep: 4 bins for CMS with mean F1 1.000
