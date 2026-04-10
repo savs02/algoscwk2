@@ -231,6 +231,7 @@ def plot_per_type_breakdown():
 
 def plot_threshold_sweep():
     df = pd.read_csv(EVAL_DIR / "threshold_sweep.csv")
+    # Average over sketch and seed at each threshold.
     summary = aggregate(df, ["threshold"])
     plt.figure(figsize=(8, 4.8))
     plt.plot(summary["threshold"], summary["mean"], color="#0f4c5c",
@@ -241,7 +242,7 @@ def plot_threshold_sweep():
                      alpha=0.18,
                      color="#0f4c5c")
     plt.ylim(0, 1.05)
-    plt.ylabel("Validation F1")
+    plt.ylabel("Validation F1 (mean over 3 sketches × 2 seeds)")
     plt.xlabel("Normalized L1 Threshold")
     plt.title("Threshold Selection")
     plt.grid(axis="y", alpha=0.25)
@@ -493,6 +494,10 @@ def main():
     sensitivity_summary = plot_line_sweep(
         "sensitivity_sweep.csv", "magnitude", "Sensitivity Sweep", "sensitivity_sweep.png"
     )
+    epoch_summary = plot_line_sweep(
+        "epoch_sweep.csv", "epoch_size", "Epoch Size Sweep", "epoch_sweep.png"
+    )
+
     memory_summary = plot_memory_sweep()   # add this line
     bin_scheme_summary = plot_bin_scheme()
     hash_rotation_df = plot_hash_rotation()

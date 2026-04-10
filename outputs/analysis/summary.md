@@ -3,17 +3,17 @@
 ## Detector (5 held-out seeds, all 5 anomalies together)
 - Baseline raw L1: F1 = 0.875 ± 0.000
 - Improved normalized: F1 = 0.979 ± 0.027
-- Best validation threshold: 0.50 (val mean F1 0.900)
+- Best validation threshold: 0.45 (val mean F1 1.000)
 
 ## Per-type recall (mean across 3 sketches)
 - Baseline hardest type: Disappearance (recall 0.000)
 - Improved hardest type: Disappearance (recall 1.000)
 
-- Minimum viable memory (mean F1 >= 0.9): w=32, 15.0 KB (CMS, F1=0.938)
+- Minimum viable memory (mean F1 >= 0.9): w=32, 15.0 KB (CMS, F1=0.909)
 ## Sweeps
 - Best bins setting in current sweep: 4 bins for CMS with mean F1 1.000
-- Weakest snapshot setting: K=16 for CS with mean F1 0.033
-- Hardest Zipf regime: alpha=0.5 with mean F1 0.912
+- Weakest snapshot setting: K=16 for CS with mean F1 0.952
+- Hardest Zipf regime: alpha=0.5 with mean F1 0.902
 - Lowest sensitivity point: magnitude=1.1 with mean F1 0.200
 
 ## Structure
