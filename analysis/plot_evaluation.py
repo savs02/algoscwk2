@@ -91,6 +91,69 @@ def plot_baseline_vs_improved():
     savefig("baseline_vs_improved.png")
     return df
 
+def plot_memory_sweep():
+    path = EVAL_DIR / "memory_sweep.csv"
+    if not path.exists():
+        return None
+    df = pd.read_csv(path)
+    if df.empty:
+        return df
+
+    # Aggregate across seeds per (sketch, width). Keep memory_bytes for x-axis.
+    summary = (df.groupby(["sketch", "width", "memory_bytes"], as_index=False)
+                 .agg(mean=("f1", "mean"), std=("f1", "std")))
+    summary["std"] = summary["std"].fillna(0.0)
+    summary["memory_kb"] = summary["memory_bytes"] / 1024.0
+
+    plt.figure(figsize=(8.4, 5.0))
+    ax = plt.gca()
+    for sketch in SKETCH_ORDER:
+        sub = summary[summary["sketch"] == sketch].sort_values("width")
+        if sub.empty:
+            continue
+        ax.errorbar(
+            sub["memory_kb"],
+            sub["mean"],
+            yerr=sub["std"],
+            label=sketch,
+            color=SKETCH_COLORS[sketch],
+            linestyle=SKETCH_LINESTYLES[sketch],
+            marker=SKETCH_MARKERS[sketch],
+            linewidth=2.2,
+            markersize=6.5,
+            capsize=3,
+            elinewidth=1.0,
+            markeredgecolor="#1f1f1f",
+            markeredgewidth=0.7,
+        )
+
+    ax.set_xscale("log", base=2)
+    ax.set_ylim(0, 1.05)
+    ax.set_xlabel("Total memory (KB, log scale) — width × depth × bins × snapshots × 4B")
+    ax.set_ylabel("F1 Score")
+    ax.set_title("Memory vs F1 Tradeoff (5 held-out seeds, improved detector)")
+    ax.legend(title="Sketch", loc="lower right")
+    ax.grid(which="both", axis="both", alpha=0.25)
+    ax.set_axisbelow(True)
+
+    # Annotate each point with its width for readability.
+    widths_seen = sorted(summary["width"].unique())
+    for w in widths_seen:
+        row = summary[(summary["sketch"] == "CMS") & (summary["width"] == w)]
+        if not row.empty:
+            ax.annotate(
+                f"w={w}",
+                xy=(row["memory_kb"].iloc[0], row["mean"].iloc[0]),
+                xytext=(0, -14),
+                textcoords="offset points",
+                fontsize=8,
+                ha="center",
+                color="#555",
+            )
+
+    savefig("memory_sweep.png")
+    return summary
+
 def plot_per_type_breakdown():
     path = EVAL_DIR / "per_type_breakdown.csv"
     if not path.exists():
@@ -310,7 +373,7 @@ def plot_confusion():
 
 def write_summary(threshold_summary, bins_summary, snapshots_summary, zipf_summary,
                   sensitivity_summary, bin_scheme_summary, hash_rotation_df,
-                  classifier_summary, per_type_df):
+                  classifier_summary, per_type_df, memory_summary):
     baseline = pd.read_csv(EVAL_DIR / "baseline_vs_improved.csv")
     best_threshold_row = threshold_summary.loc[threshold_summary["mean"].idxmax()]
     bins_best = bins_summary.sort_values("mean", ascending=False).iloc[0]
@@ -360,6 +423,17 @@ def write_summary(threshold_summary, bins_summary, snapshots_summary, zipf_summa
                 f"(recall {improved_per_type.iloc[0]:.3f})"
             )
         lines.append("")
+    if memory_summary is not None and not memory_summary.empty:
+        # Find smallest width where mean F1 >= 0.9 (the "minimum viable memory")
+        viable = (memory_summary[memory_summary["mean"] >= 0.9]
+                  .sort_values("memory_bytes"))
+        if not viable.empty:
+            first = viable.iloc[0]
+            lines += [
+                f"- Minimum viable memory (mean F1 >= 0.9): "
+                f"w={int(first['width'])}, {first['memory_bytes']/1024:.1f} KB "
+                f"({first['sketch']}, F1={first['mean']:.3f})",
+            ]
 
     lines += [
         "## Sweeps",
@@ -419,6 +493,7 @@ def main():
     sensitivity_summary = plot_line_sweep(
         "sensitivity_sweep.csv", "magnitude", "Sensitivity Sweep", "sensitivity_sweep.png"
     )
+    memory_summary = plot_memory_sweep()   # add this line
     bin_scheme_summary = plot_bin_scheme()
     hash_rotation_df = plot_hash_rotation()
     classifier_summary = plot_classifier_accuracy()
@@ -433,6 +508,7 @@ def main():
         hash_rotation_df,
         classifier_summary,
         per_type_df,
+        memory_summary,
     )
     print(f"Wrote plots to {PLOTS_DIR}")
     print(f"Wrote summary to {ANALYSIS_DIR / 'summary.md'}")

@@ -458,6 +458,46 @@ static void run_bins_sweep(const fs::path& out_dir, const DetectorConfig& detect
     }
 }
 
+static void run_memory_sweep(const fs::path& out_dir, const DetectorConfig& detector) {
+    // Fix everything except width. This isolates the memory/accuracy tradeoff
+    // from the confounds that bins_sweep and snapshots_sweep introduce
+    // (those reduce width as a function of bins/K to hold total memory fixed).
+    constexpr int depth      = 3;
+    constexpr int bins       = 10;
+    constexpr int snapshots  = 4;
+    constexpr int num_flows  = 100;
+    constexpr int num_epochs = 4;
+    constexpr int epoch_size = 5000;
+    constexpr double zipf_alpha = 1.5;
+
+    BinConfig cfg(bins, 0.5, 200.0, BinScheme::Logarithmic);
+    const std::vector<uint32_t> seeds = {44, 45, 46, 47, 48};
+    const std::vector<int> widths = {32, 64, 128, 256, 512, 1024};
+
+    std::ofstream out(out_dir / "memory_sweep.csv");
+    out << "sketch,width,memory_bytes,seed,tp,fp,fn,f1\n";
+
+    for (int width : widths) {
+        // Per-snapshot memory; total across K snapshots = this * snapshots.
+        // counter size = 4 bytes (int32_t), matching the rest of the repo.
+        const long mem_bytes =
+            static_cast<long>(width) * depth * bins * 4 * snapshots;
+
+        for (uint32_t seed : seeds) {
+            auto gs = make_eval_stream(num_flows, num_epochs, epoch_size,
+                                       zipf_alpha, 2.0, seed);
+            for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+                auto res = run_detection(kind, width, depth, snapshots,
+                                         gs, cfg, detector);
+                out << sketch_name(kind) << "," << width << ","
+                    << mem_bytes << "," << seed << ","
+                    << res.tp << "," << res.fp << "," << res.fn << ","
+                    << res.f1() << "\n";
+            }
+        }
+    }
+}
+
 static void run_snapshots_sweep(const fs::path& out_dir, const DetectorConfig& detector) {
     constexpr int base_width = 1024;
     constexpr int depth = 3;
@@ -782,6 +822,7 @@ int main() {
 
     run_bins_sweep(out_dir, improved);
     run_snapshots_sweep(out_dir, improved);
+    run_memory_sweep(out_dir, improved);   
     run_zipf_sweep(out_dir, improved);
     run_sensitivity_sweep(out_dir, improved);
     run_bin_scheme_comparison(out_dir, improved);
@@ -801,5 +842,6 @@ int main() {
     std::cout << "  outputs/evaluation/classifier_accuracy_vs_n.csv\n";
     std::cout << "  outputs/evaluation/classifier_confusion_matrix.csv\n";
     std::cout << "  outputs/evaluation/per_type_breakdown.csv\n";
+    std::cout << "  outputs/evaluation/memory_sweep.csv\n";
     return 0;
 }

@@ -9,6 +9,7 @@
 - Baseline hardest type: Disappearance (recall 0.000)
 - Improved hardest type: Disappearance (recall 1.000)
 
+- Minimum viable memory (mean F1 >= 0.9): w=32, 15.0 KB (CMS, F1=0.938)
 ## Sweeps
 - Best bins setting in current sweep: 4 bins for CMS with mean F1 1.000
 - Weakest snapshot setting: K=16 for CS with mean F1 0.033
