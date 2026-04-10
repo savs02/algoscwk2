@@ -341,8 +341,7 @@ def plot_hash_rotation():
     ax.set_ylabel("Mean Residual L1")
     ax.set_xlabel("Flow")
     ax.set_title("Hash Rotation Residuals")
-    ax.legend(title="Sketch", ncol=3, frameon=True, loc="upper center",
-              bbox_to_anchor=(0.5, 1.18))
+    ax.legend(title="Sketch", loc="upper left", fontsize="small", title_fontsize="small")
     ax.grid(axis="y", alpha=0.25)
     ax.set_axisbelow(True)
     savefig("hash_rotation.png")

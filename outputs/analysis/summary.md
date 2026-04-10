@@ -18,7 +18,7 @@
 
 ## Structure
 - Mean F1 by scheme: log=0.917, uniform=0.255
-- CU-CMS hash-rotation residuals remain zero in this experiment: max mean L1=0.2
+- CU-CMS hash-rotation residuals remain zero in this experiment: max mean L1=75.7
 
 ## Classifier
 - Lowest packet regime (100 packets) mean accuracy: 0.333

@@ -682,8 +682,7 @@ static void run_hash_rotation_experiment(const fs::path& out_dir) {
     out << "sketch,flow,mean_l1,std_l1\n";
 
     for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
-        std::vector<double> flow1_l1;
-        std::vector<double> flow10_l1;
+        std::vector<double> flow1_l1, flow10_l1, flow100_l1, flow1000_l1, flow10000_l1;
 
         for (uint32_t pair_seed = 0; pair_seed < 10; ++pair_seed) {
             std::mt19937 rng(1000 + pair_seed);
@@ -702,12 +701,21 @@ static void run_hash_rotation_experiment(const fs::path& out_dir) {
 
             flow1_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "1")).l1);
             flow10_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "10")).l1);
+            flow100_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "100")).l1);
+            flow1000_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "1000")).l1);
+            flow10000_l1.push_back(compute_scores(diff_histograms(*sk_a, *sk_b, "10000")).l1);
         }
 
         out << sketch_name(kind) << ",1," << mean(flow1_l1) << ","
             << stdev(flow1_l1) << "\n";
         out << sketch_name(kind) << ",10," << mean(flow10_l1) << ","
             << stdev(flow10_l1) << "\n";
+        out << sketch_name(kind) << ",100," << mean(flow100_l1) << ","
+            << stdev(flow100_l1) << "\n";
+        out << sketch_name(kind) << ",1000," << mean(flow1000_l1) << ","
+            << stdev(flow1000_l1) << "\n";
+        out << sketch_name(kind) << ",10000," << mean(flow10000_l1) << ","
+            << stdev(flow10000_l1) << "\n";
     }
 }
 
