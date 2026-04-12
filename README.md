@@ -76,6 +76,7 @@ src/
 │   └── stream_generator.hpp  Synthetic multi-epoch Zipf stream; AnomalySpec injection
 │
 ├── main.cpp                 Consolidated pipeline runner (all 6 stages; see below)
+├── evaluation.cpp           Report-facing evaluation sweeps (writes CSVs to outputs/evaluation/)
 ├── checkpoint1.cpp  …  checkpoint6.cpp   Original per-checkpoint baselines
 │
 include/
@@ -284,196 +285,29 @@ cmake --build build
 
 ---
 
-## Implementation Tasks for the Evaluation Section
+## Evaluation Experiments
 
-The following experiments are **not yet implemented** but are the most important for making the report's evaluation section credible. They are listed in priority order. Each task is self-contained so they can be picked up independently.
+All evaluation sweeps are implemented in `src/evaluation.cpp` and write CSV outputs to `outputs/evaluation/`. Run them with:
 
-All of them slot into `src/main.cpp` as new `run_experiment_X()` functions called from `main()` after Stage 6. None require changes to any of the sketch or temporal headers — they are purely combinations of infrastructure that already exists.
-
----
-
-### Task 1 — Memory vs F1 sweep (highest priority)
-
-**Why it matters:** The central claim of any sketch paper is that you pay a small memory cost for an acceptable accuracy loss. Without a memory/accuracy tradeoff curve this claim is asserted, not demonstrated.
-
-**What to implement:**
-
-```cpp
-// In main.cpp, add after run_stage6():
-static void run_experiment_memory_sweep() {
-    // Fix: NUM_FLOWS=100, NUM_EPOCHS=4, EPOCH_SIZE=5000, seed=42, 5 anomalies (same as Stage 6)
-    // Sweep w in {32, 64, 128, 256, 512, 1024}, d=3 fixed
-    // For each w: run run_stage6_detection() for all 3 sketch types with the
-    //   improved detector (NormalisedL1, best_thresh=0.25, ABS_FLOOR=30)
-    // Report: w, sketch, memory_bytes (= w*d*B*4), F1, TP, FP, FN
-    // memory_bytes = w * 3 * 10 * 4 bytes (width * depth * bins * int32)
-}
+```bash
+cmake --build build --target evaluation
+./build/evaluation
 ```
 
-**Expected output format:**
-```
-w=32    CMS     mem=3840B   F1=?
-w=64    CMS     mem=7680B   F1=?
-...
-w=1024  CMS     mem=122880B F1=?
-```
+The following experiments are included:
 
-**Expected finding:** F1 should plateau at some moderate width (probably w=128–256). Below that, collision noise dominates and F1 drops. This gives you a "minimum viable memory" number to put in the report.
-
-**Report figure:** F1 vs log2(w) for CMS, CU-CMS, CS on the same axes. Three lines, x-axis is memory in KB.
-
----
-
-### Task 2 — Per-change-type F1 breakdown
-
-**Why it matters:** The aggregate F1 of 0.941 hides which anomaly types are easy and which are hard. GradualRamp is visibly the hardest (it's the one FN in the improved run). A breakdown table makes the analysis concrete and gives you something interesting to discuss.
-
-**What to implement:**
-
-The ground truth already has per-flow labels. In `run_stage6_detection()` the detected set and GT set are both indexed by `(flow_id, boundary)`. You need to further tag each GT entry with its anomaly type (look it up from `anomaly_specs`).
-
-```cpp
-// Add a per-type breakdown map to S6DetectionResult:
-struct S6DetectionResult {
-    int tp = 0, fp = 0, fn = 0;
-    std::map<AnomalyType, int> tp_by_type, fn_by_type;
-    // ... existing precision/recall/f1 methods
-};
-```
-
-Then after computing TP/FP/FN in `run_stage6_detection()`, additionally record which anomaly type each TP and FN belongs to.
-
-**Expected output:**
-```
-AnomalyType     TP   FN   recall
-SuddenSpike      2    0    1.000
-GradualRamp      1    1    0.500   <- hardest
-PeriodicBurst    3    0    1.000
-Spread           1    0    1.000
-Disappearance    1    0    1.000
-```
-
-**Report table:** one row per anomaly type, baseline vs improved side by side.
-
----
-
-### Task 3 — Anomaly magnitude sensitivity
-
-**Why it matters:** The detector threshold is meaningless without knowing *how strong* an anomaly needs to be to get detected. A sensitivity curve is one of the most useful plots in the report.
-
-**What to implement:**
-
-```cpp
-static void run_experiment_magnitude_sweep() {
-    // Fix all parameters at Stage 6 defaults (w=1024, seed=42, etc.)
-    // Sweep SuddenSpike magnitude in {1.1, 1.2, 1.5, 2.0, 3.0, 5.0}
-    //   (recall that magnitude=2.0 is the current "easy" setting)
-    // For each magnitude: regenerate anomalies vector with that spike magnitude
-    //   (keep other anomaly types at their current magnitudes)
-    // Run improved detector; record F1 for SuddenSpike specifically
-    // Separately sweep GradualRamp magnitude in {1.05, 1.1, 1.2, 1.5}
-    //   (GradualRamp is the hardest type; showing its sensitivity is interesting)
-}
-```
-
-**Expected finding:** SuddenSpike should be detectable at magnitude ≥ 1.5; GradualRamp likely needs magnitude ≥ 1.2 (it's currently at the detection boundary). This directly answers: "what is the minimum detectable change for each anomaly type?"
-
-**Report figure:** F1 vs magnitude for SuddenSpike and GradualRamp as two separate lines.
-
----
-
-### Task 4 — Epoch size sensitivity
-
-**Why it matters:** In real deployments, epoch length is a free parameter. Too short and you don't have enough packets to detect anything; too long and you miss fast-changing anomalies. This tradeoff needs to be quantified.
-
-**What to implement:**
-
-```cpp
-static void run_experiment_epoch_sweep() {
-    // Sweep EPOCH_SIZE in {500, 1000, 2000, 5000, 10000}
-    // Fix w=1024, seed=42, same 5 anomalies
-    // Run improved detector for all 3 sketches
-    // Report: epoch_size, total_packets, F1 per sketch
-    // Note: epoch_duration in generate_stream() = epoch_size, so this
-    //   is a single-parameter change on the existing call
-}
-```
-
-**Expected finding:** F1 should drop sharply below EPOCH_SIZE ~1000 (not enough packets for lighter flows to generate signal). Above ~2000 it should plateau. The exact breakpoints are interesting.
-
----
-
-### Task 5 — Classifier confusion matrix
-
-**Why it matters:** Stage 5 only reports pass/fail per case. For the report you need to show *what* the classifier gets wrong — does Spread get confused with Shift? Does GradualRamp look like a Spike at low N?
-
-**What to implement:**
-
-Modify `s5_run_suite()` to return not just `passed/total` but a full 6×6 confusion matrix (ChangeType predicted vs actual). The function already has `rx = classify_change(diff_x)` and `tc.expected` — just tally the `(tc.expected, rx)` pair into a matrix.
-
-```cpp
-// Add to S5SuiteSummary:
-struct S5SuiteSummary {
-    int total = 0, passed = 0;
-    // confusion[actual][predicted] = count
-    std::map<ChangeType, std::map<ChangeType, int>> confusion;
-};
-```
-
-Run this at **N=1000** (clean) and **N=200** (degraded) for both seed 42 and seed 43 so you have four matrices to discuss.
-
-**Expected finding:** At N=1000, diagonal-only. At N=200, Spread likely leaks into Shift (they have similar diff shapes at low signal), and GradualRamp may be classified as None (signal too weak). These off-diagonal entries are exactly what to discuss in the report's Conclusions section.
-
----
-
-### Task 6 — Zipf skewness sweep
-
-**Why it matters:** Heavier Zipf (higher alpha) means traffic is more concentrated in top flows. This affects how much collision noise lighter flows accumulate in the sketch. It's a standard parameter in the sketch literature.
-
-**What to implement:**
-
-```cpp
-static void run_experiment_zipf_sweep() {
-    // Sweep ZIPF_ALPHA in {0.5, 1.0, 1.5, 2.0}
-    // Fix everything else at Stage 6 defaults
-    // Report F1 per sketch and alpha
-    // Note: at alpha=2.0, traffic is very concentrated; lighter anomaly flows
-    //   (flows 4 and 5 in the Zipf ordering) receive almost no packets,
-    //   making detection very hard regardless of detector design
-}
-```
-
-**Expected finding:** F1 will degrade at high alpha because anomaly flows 4 and 5 (Spread, Disappearance) become too light to generate signal above the threshold. This is a genuine limitation of absolute-threshold detectors that the normalised variant partially addresses.
-
----
-
-### Suggested order of implementation
-
-| Priority | Task | Effort | Report impact |
-|----------|------|--------|---------------|
-| 1 | Memory vs F1 sweep | ~30 min | Highest — core tradeoff plot |
-| 2 | Per-change-type F1 breakdown | ~45 min | Needed to discuss which types are hard |
-| 3 | Anomaly magnitude sensitivity | ~30 min | Answers "minimum detectable change" |
-| 4 | Epoch size sensitivity | ~20 min | Shows deployment tradeoffs |
-| 5 | Classifier confusion matrix | ~45 min | Needed for Stage 5 discussion |
-| 6 | Zipf skewness sweep | ~20 min | Adds depth to memory/accuracy discussion |
-
-Tasks 1–4 can be done as plain loops inside new functions in `main.cpp` with no structural changes. Task 5 requires a small struct change in `s5_run_suite`. Task 6 is a single outer loop around the existing Stage 6 call.
-
----
-
-### Note on adding to `main()`
-
-Add each experiment call at the bottom of `main()` after `run_stage6()`, guarded by a comment so they're clearly informational and don't affect the PASS/FAIL exit code:
-
-```cpp
-// Experiments for evaluation section (informational — do not affect exit code)
-run_experiment_memory_sweep();
-run_experiment_per_type_breakdown();
-run_experiment_magnitude_sweep();
-run_experiment_epoch_sweep();
-run_experiment_confusion_matrix();
-run_experiment_zipf_sweep();
-```
-
-None of these should call `pass &= ...` — they are purely for generating report numbers.
+| Function | CSV output | Purpose |
+|---|---|---|
+| `run_threshold_selection` | `threshold_sweep.csv` | Val-seed F1 vs threshold; selects best_threshold |
+| `run_baseline_vs_improved` | `baseline_vs_improved.csv`, `per_type_breakdown.csv` | Baseline vs improved detector; per-anomaly-type TP/FN |
+| `run_bins_sweep` | `bins_sweep.csv` | F1 vs number of histogram bins B |
+| `run_memory_sweep` | `memory_sweep.csv` | F1 vs sketch width (memory/accuracy tradeoff) |
+| `run_snapshots_sweep` | `snapshots_sweep.csv` | F1 vs number of retained epoch snapshots K |
+| `run_epoch_sweep` | `epoch_sweep.csv` | F1 vs epoch size (packets per epoch) |
+| `run_zipf_sweep` | `zipf_sweep.csv` | F1 vs Zipf alpha (traffic skewness) |
+| `run_sensitivity_sweep` | `sensitivity_sweep.csv` | F1 vs anomaly magnitude (minimum detectable change) |
+| `run_bin_scheme_comparison` | `bin_scheme_comparison.csv` | Uniform vs logarithmic bin edges |
+| `run_hash_rotation_experiment` | `hash_rotation.csv` | L1 residual under different-seed epochs per sketch type |
+| `run_classification_evaluation` | `classifier_accuracy_vs_n.csv`, `classifier_confusion_matrix.csv` | Classifier accuracy and confusion matrix vs N |
+| `run_flow_count_sweep` | `flow_count_sweep.csv` | F1 vs number of flows in the stream |
+| `run_grey_failure_comparison` | `grey_failure_comparison.csv` | Detector comparison on subtle/grey failure anomalies |
