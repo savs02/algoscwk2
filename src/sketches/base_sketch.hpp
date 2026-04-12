@@ -6,6 +6,8 @@
 #include "../../include/MurmurHash3.hpp"
 #include "bin_config.hpp"
 
+// basic sketch representation
+
 class BaseSketch {
 protected:
     int       w_, d_;
