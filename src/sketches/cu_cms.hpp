@@ -5,24 +5,7 @@
 #include <vector>
 #include "base_sketch.hpp"
 
-// ---------------------------------------------------------------------------
-// ConservativeUpdateCMS (CU-CMS) — histogram variant
-//
-// Per-bin conservative update: each bin is treated as an independent CMS
-// counter with the conservative-update rule applied only to the bin that
-// was actually hit.
-//
-// update : b = get_bin(value)
-//          estimate_b = min_j counters[j][h_j(key)][b]
-//          new_val    = estimate_b + 1
-//          for each j: counters[j][h][b] = max(counters[j][h][b], new_val)
-//
-// Counters in unaffected bins are never touched, so cross-bin noise is
-// eliminated.  Within a bin, the conservative rule prevents heavy flows from
-// inflating light-flow estimates beyond what the light flow actually needs.
-//
-// Assumption: latency values are non-negative (asserted below).
-// ---------------------------------------------------------------------------
+
 
 class ConservativeUpdateCMS : public BaseSketch {
     std::vector<std::vector<std::vector<int32_t>>> counters_;
@@ -39,7 +22,7 @@ public:
         assert(value >= 0.0 && "CU-CMS only supports non-negative latency values");
         int b = bin_cfg_.get_bin(value);
 
-        // Conservative update for bin b only.
+        // conservative update for bin b only
         int32_t estimate = std::numeric_limits<int32_t>::max();
         for (int j = 0; j < d_; ++j) {
             int32_t v = counters_[j][hash_pos(key, j)][b];

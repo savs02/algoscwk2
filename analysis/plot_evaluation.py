@@ -99,7 +99,6 @@ def plot_memory_sweep():
     if df.empty:
         return df
 
-    # Aggregate across seeds per (sketch, width). Keep memory_bytes for x-axis.
     summary = (df.groupby(["sketch", "width", "memory_bytes"], as_index=False)
                  .agg(mean=("f1", "mean"), std=("f1", "std")))
     summary["std"] = summary["std"].fillna(0.0)
@@ -135,7 +134,6 @@ def plot_memory_sweep():
     ax.grid(which="both", axis="both", alpha=0.25)
     ax.set_axisbelow(True)
 
-    # Annotate each point with its width for readability.
     widths_seen = sorted(summary["width"].unique())
     for w in widths_seen:
         row = summary[(summary["sketch"] == "CMS") & (summary["width"] == w)]
@@ -171,7 +169,7 @@ def plot_per_type_breakdown():
     type_order = [t for t in type_order if t in df["anomaly_type"].unique()]
     n_seeds = df["seed"].nunique()
 
-    # --- Main plot: recall per anomaly type, averaged across sketches AND seeds ---
+  
     plt.figure(figsize=(11, 5.2))
     sns.barplot(
         data=df,
@@ -193,7 +191,6 @@ def plot_per_type_breakdown():
     plt.grid(axis="y", alpha=0.25)
     savefig("per_type_recall.png")
 
-    # --- Faceted plot: per sketch, still averaged across seeds ---
     g = sns.catplot(
         data=df,
         x="anomaly_type",
@@ -230,7 +227,6 @@ def plot_per_type_breakdown():
 
 def plot_threshold_sweep():
     df = pd.read_csv(EVAL_DIR / "threshold_sweep.csv")
-    # Average over sketch and seed at each threshold.
     summary = aggregate(df, ["threshold"])
     plt.figure(figsize=(8, 6.0))
     plt.plot(summary["threshold"], summary["mean"], color="#0f4c5c",
@@ -390,7 +386,6 @@ def plot_confusion():
     type_order = ["Disappearance", "VolumeChange", "Spike", "Shift", "Spread"]
 
     if "sketch" in df.columns:
-        # Per-sketch version: one heatmap per sketch type
         fig, axes = plt.subplots(1, 3, figsize=(17, 5))
         for ax, sketch in zip(axes, SKETCH_ORDER):
             sub = df[df["sketch"] == sketch]
@@ -415,7 +410,6 @@ def plot_confusion():
                     dpi=180, bbox_inches="tight")
         plt.close(fig)
     else:
-        # Legacy: single aggregated heatmap
         pivot = df.pivot(index="expected", columns="predicted", values="count").fillna(0)
         plt.figure(figsize=(6, 5))
         sns.heatmap(pivot, annot=True, fmt=".0f", cmap="Blues")
@@ -453,7 +447,6 @@ def plot_grey_failure():
     if df.empty:
         return df
 
-    # --- Detection-rate bar chart ---
     long_rows = []
     for _, row in df.iterrows():
         long_rows.append({"sketch": row["sketch"], "scenario": row["scenario"],
@@ -491,7 +484,6 @@ def plot_grey_failure():
     plt.grid(axis="y", alpha=0.25)
     savefig("grey_failure_comparison.png")
 
-    # --- Scatter: L1 score vs count ratio, annotated with detector thresholds ---
     scenario_colors = dict(zip(scenario_order,
                                ["#e36414", "#5f0f40", "#0f4c5c"]))
     plt.figure(figsize=(8, 5))
@@ -570,7 +562,6 @@ def write_summary(threshold_summary, bins_summary, snapshots_summary, zipf_summa
             )
         lines.append("")
     if memory_summary is not None and not memory_summary.empty:
-        # Find smallest width where mean F1 >= 0.9 (the "minimum viable memory")
         viable = (memory_summary[memory_summary["mean"] >= 0.9]
                   .sort_values("memory_bytes"))
         if not viable.empty:

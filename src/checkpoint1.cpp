@@ -1,15 +1,4 @@
-// Checkpoint 1 — Basic sketch accuracy on a Zipf frequency stream.
-//
-// Stage 2 API update: sketches now require a BinConfig.
-// A 1-bin config over [0, 2) is used so that update(key, 1.0) places every
-// packet in bin 0 and query(key) = sum of histogram = frequency count.
-// Results should be identical to the original Stage 1 output.
-//
-// Expected behaviour
-// ------------------
-//   CMS    : always overestimates  → positive avg signed error
-//   CU-CMS : also overestimates, but less than CMS
-//   CS     : unbiased              → avg signed error ≈ 0, errors both ways
+// Checkpoint 1 - basic sketch accuracy on a Zipf frequency stream
 
 #include <cmath>
 #include <iomanip>
@@ -48,7 +37,6 @@ int main() {
     std::mt19937 rng(SEED);
     ZipfDistribution zipf(N_MAX_KEY, ZIPF_ALPHA);
 
-    // 1-bin config: any value in [0, 2) → bin 0. Pure frequency counting.
     BinConfig cfg(1, 0.0, 2.0);
 
     std::map<std::string, int> ground_truth;

@@ -1,28 +1,23 @@
-// Checkpoint 6 — Synthetic stream generator and F1 evaluation.
-//
-// Stream: 100 Zipf flows, 4 epochs × 5000 packets = 20 000 total.
-// Five anomaly flows are injected (one per type, assigned to the 5 heaviest flows
-// so they have enough packets to reliably detect):
-//
-//   Flow "1" — SuddenSpike   : mean doubles for epoch 1 only, returns to normal
-//   Flow "2" — GradualRamp   : mean grows ×1.2 per epoch from epoch 1
-//   Flow "3" — PeriodicBurst : alternates high/normal from epoch 1
-//   Flow "4" — Spread        : sigma doubles from epoch 1 onward
-//   Flow "5" — Disappearance : no packets from epoch 1 onward
-//
-// Ground truth: (flow_id, boundary) pairs where the distribution changes
-// between adjacent epochs.
-//
-// Detection: for each sketch type, for every adjacent epoch pair, query each
-// flow and flag as a heavy changer if L1 > threshold.
-//
-// Output:
-//   1. Clean checkpoint run: per-sketch table of TP/FP/FN and F1 score
-//   2. Informational robustness sweep across seeds / widths / thresholds
-//
-// As with checkpoint 5, the threshold and anomaly setup are heuristic rather
-// than formally optimal. The clean run is the checkpoint pass/fail target;
-// the sweep is there to show empirical behaviour under noisier settings.
+"""
+Checkpoint 6 — Synthetic stream generator and F1 evaluation.
+
+Stream: 100 Zipf flows, 4 epochs × 5000 packets = 20 000 total.
+Five anomaly flows are injected (one per type, assigned to the 5 heaviest flows
+so they have enough packets to reliably detect):
+
+  Flow 1 — SuddenSpike   : mean doubles for epoch 1 only, returns to normal
+  Flow 2 — GradualRamp   : mean grows ×1.2 per epoch from epoch 1
+  Flow 3 — PeriodicBurst : alternates high/normal from epoch 1
+  Flow 4 — Spread        : sigma doubles from epoch 1 onward
+  Flow 5 — Disappearance : no packets from epoch 1 onward
+
+Ground truth: (flow_id, boundary) pairs where the distribution changes
+between adjacent epochs.
+
+Detection: for each sketch type, for every adjacent epoch pair, query each
+flow and flag as a heavy changer if L1 > threshold.
+
+"""
 
 #include <algorithm>
 #include <cmath>
@@ -45,7 +40,6 @@
 #include "temporal/differencer.hpp"
 #include "generator/stream_generator.hpp"
 
-// ---------------------------------------------------------------------------
 
 struct DetectionResult {
     int tp = 0, fp = 0, fn = 0;
@@ -67,7 +61,6 @@ struct EvaluationSummary {
     DetectionResult result;
 };
 
-// ---------------------------------------------------------------------------
 
 static DetectionResult run_detection(
     const std::string&                              sketch_name,
@@ -86,22 +79,17 @@ static DetectionResult run_detection(
     for (const auto& [ts, key, lat] : gs.packets)
         proc.process(ts, key, lat);
 
-    // Build ground-truth set: (flow_id, boundary).
+    // build ground-truth set (flow_id, boundary)
     std::set<std::pair<std::string, int>> gt_set;
     for (const auto& e : gs.ground_truth)
         gt_set.insert({e.flow_id, e.boundary});
 
-    // Detect: for each adjacent epoch pair and each known flow.
-    // get_previous_sketch(0)         = most recent epoch (K-1)
-    // get_previous_sketch(K-1)       = oldest epoch (0)
-    // Boundary b = epoch b → epoch b+1.
-    // Sketch for epoch e = get_previous_sketch(K-1 - e).
-
+    // detect for each adjacent epoch pair and each known flow
     std::set<std::pair<std::string, int>> detected_set;
 
     for (int b = 0; b < K - 1; ++b) {
-        const BaseSketch& sk_new = em.get_previous_sketch(K - 2 - b);  // epoch b+1
-        const BaseSketch& sk_old = em.get_previous_sketch(K - 1 - b);  // epoch b
+        const BaseSketch& sk_new = em.get_previous_sketch(K - 2 - b);  
+        const BaseSketch& sk_old = em.get_previous_sketch(K - 1 - b); 
 
         for (const auto& fid : gs.flow_keys) {
             auto diff   = diff_histograms(sk_new, sk_old, fid);
@@ -111,7 +99,7 @@ static DetectionResult run_detection(
         }
     }
 
-    // Compute TP / FP / FN.
+    // compute TP / FP / FN
     DetectionResult res;
     for (const auto& d : detected_set) {
         if (gt_set.count(d)) ++res.tp;
@@ -124,7 +112,6 @@ static DetectionResult run_detection(
     if (verbose) {
         std::cout << "\n  " << sketch_name << ":\n";
 
-        // Print per-boundary per-anomaly table.
         std::cout << "  " << std::setw(10) << "Flow"
                   << std::setw(12) << "Anomaly"
                   << std::setw(10) << "Boundary"
@@ -133,12 +120,10 @@ static DetectionResult run_detection(
                   << std::setw(8)  << "L1\n";
         std::cout << "  " << std::string(56, '-') << "\n";
 
-        // Build anomaly type lookup.
         std::unordered_map<std::string, const char*> anom_name_map;
         for (const auto& a : anomaly_specs)
             anom_name_map[a.flow_id] = anomaly_type_name(a.type);
 
-        // Only print anomaly flows.
         std::vector<std::string> anomaly_flow_ids;
         for (const auto& e : gs.ground_truth) {
             if (std::find(anomaly_flow_ids.begin(), anomaly_flow_ids.end(), e.flow_id)
@@ -203,7 +188,6 @@ static std::vector<EvaluationSummary> evaluate_all_sketches(
     return out;
 }
 
-// ---------------------------------------------------------------------------
 
 int main() {
     constexpr int      NUM_FLOWS   = 100;
@@ -219,7 +203,7 @@ int main() {
 
     BinConfig cfg(10, 0.5, 200.0, BinScheme::Logarithmic);
 
-    // Five anomaly flows assigned to the top-5 Zipf flows (heaviest hitters).
+    // five anomaly flows assigned to the top-5 Zipf flows (heaviest hitters)
     std::vector<AnomalySpec> anomalies = {
         {"1", AnomalyType::SuddenSpike,   1, 2.0},
         {"2", AnomalyType::GradualRamp,   1, 1.2},
@@ -242,14 +226,12 @@ int main() {
               << "target. The robustness sweep later is informational and shows\n"
               << "how sensitive detection is to seed / memory / threshold choices.\n\n";
 
-    // Print anomaly specs.
     std::cout << "Injected anomalies:\n";
     for (const auto& a : anomalies)
         std::cout << "  Flow " << a.flow_id
                   << ": " << anomaly_type_name(a.type)
                   << " starting epoch " << a.start_epoch << "\n";
 
-    // Print ground truth.
     std::cout << "\nGround truth (" << gs.ground_truth.size() << " entries):\n";
     for (const auto& g : gs.ground_truth)
         std::cout << "  flow=" << g.flow_id << " boundary=" << g.boundary << "\n";

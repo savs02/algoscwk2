@@ -8,27 +8,27 @@
 #include <unordered_map>
 #include <vector>
 
-// ---------------------------------------------------------------------------
-// Synthetic multi-epoch stream generator
-//
-// Produces a stream of (timestamp, flow_key, latency) tuples that can be
-// replayed through the sketch/epoch pipeline.
-//
-// Background traffic:
-//   num_flows flows, each with a base lognormal(base_mu, base_sigma) latency.
-//   Per-epoch packet counts follow Zipf(alpha): flow i (1-indexed) receives a
-//   fraction proportional to 1/i^alpha of the epoch_size total packets.
-//
-// Anomaly injection (6b anomaly types):
-//   SuddenSpike   — mean doubles for exactly one epoch, then returns to normal
-//   GradualRamp   — mean multiplied by 1.2^k each epoch k steps after start
-//   PeriodicBurst — alternates between high (mean×2) and normal every epoch
-//   Spread        — sigma doubles from start_epoch onward
-//   Disappearance — flow stops sending from start_epoch onward
-//
-// Ground truth: the set of (flow_id, boundary_index) where the distribution
-// changes between adjacent epochs.  A boundary at index b covers epoch b→b+1.
-// ---------------------------------------------------------------------------
+"""
+Synthetic multi-epoch stream generator
+
+Produces a stream of (timestamp, flow_key, latency) tuples that can be
+replayed through the sketch/epoch pipeline.
+
+Background traffic:
+  num_flows flows, each with a base lognormal(base_mu, base_sigma) latency.
+  Per-epoch packet counts follow Zipf(alpha): flow i (1-indexed) receives a
+  fraction proportional to 1/i^alpha of the epoch_size total packets.
+
+Anomaly injection (6b anomaly types):
+  SuddenSpike   — mean doubles for exactly one epoch, then returns to normal
+  GradualRamp   — mean multiplied by 1.2^k each epoch k steps after start
+  PeriodicBurst — alternates between high (mean×2) and normal every epoch
+  Spread        — sigma doubles from start_epoch onward
+  Disappearance — flow stops sending from start_epoch onward
+
+Ground truth: the set of (flow_id, boundary_index) where the distribution
+changes between adjacent epochs.  A boundary at index b covers epoch b -> b+1.
+"""
 
 enum class AnomalyType {
     SuddenSpike,
@@ -52,36 +52,27 @@ inline const char* anomaly_type_name(AnomalyType t) {
 struct AnomalySpec {
     std::string flow_id;
     AnomalyType type;
-    int         start_epoch; // first epoch where anomaly is active
-    double      magnitude;   // multiplier; must be set explicitly — semantics differ per type
-                             // SuddenSpike/PeriodicBurst: mean * magnitude for anomaly epoch(s)
-                             // GradualRamp: mean * magnitude^steps per epoch
-                             // Spread: sigma * magnitude from start_epoch
-                             // Disappearance: unused (no packets)
+    int         start_epoch;
+    double      magnitude;  
 };
 
 struct GroundTruthEntry {
     std::string flow_id;
     int         boundary;
-    AnomalyType type;   // index e means epoch e → epoch e+1
+    AnomalyType type;
 };
 
 struct GeneratedStream {
     std::vector<std::tuple<double, std::string, double>> packets;
-    std::vector<std::string>   flow_keys;    // all distinct keys
+    std::vector<std::string>   flow_keys;  
     std::vector<GroundTruthEntry> ground_truth;
     int    num_epochs;
-    double epoch_duration;   // timestamp units per epoch
+    double epoch_duration; 
 };
 
-// ---------------------------------------------------------------------------
-
-// Return per-epoch lognormal parameters (mu, sigma) and packet count for
-// a flow given its base parameters and any anomaly spec that applies.
-// Returns {mu, sigma, n_packets}.  n_packets == 0 means no packets (disappearance).
 static std::tuple<double, double, int>
 flow_params_for_epoch(double base_mu, double base_sigma, int base_n,
-                      const AnomalySpec* anomaly,  // nullptr = no anomaly
+                      const AnomalySpec* anomaly, 
                       int epoch)
 {
     if (anomaly == nullptr)
@@ -91,31 +82,26 @@ flow_params_for_epoch(double base_mu, double base_sigma, int base_n,
 
     switch (anomaly->type) {
         case AnomalyType::SuddenSpike:
-            // Mean multiplied by magnitude for exactly one epoch.
             if (steps == 0)
                 return {base_mu + std::log(anomaly->magnitude), base_sigma, base_n};
             break;
 
         case AnomalyType::GradualRamp:
-            // Mean multiplied by 1.2^steps.
             if (steps >= 0)
                 return {base_mu + steps * std::log(anomaly->magnitude), base_sigma, base_n};
             break;
 
         case AnomalyType::PeriodicBurst:
-            // Alternates: high at start_epoch, then normal, then high, ...
             if (steps >= 0 && (steps % 2 == 0))
                 return {base_mu + std::log(anomaly->magnitude), base_sigma, base_n};
             break;
 
         case AnomalyType::Spread:
-            // Sigma doubles from start_epoch onward.
             if (steps >= 0)
                 return {base_mu, base_sigma * anomaly->magnitude, base_n};
             break;
 
         case AnomalyType::Disappearance:
-            // No packets from start_epoch onward.
             if (steps >= 0)
                 return {base_mu, base_sigma, 0};
             break;
@@ -123,12 +109,11 @@ flow_params_for_epoch(double base_mu, double base_sigma, int base_n,
     return {base_mu, base_sigma, base_n};
 }
 
-// ---------------------------------------------------------------------------
 
 inline GeneratedStream generate_stream(
     int    num_flows,
     int    num_epochs,
-    int    epoch_size,   // total packets per epoch across all flows
+    int    epoch_size, 
     double zipf_alpha,
     double base_mu,
     double base_sigma,
@@ -139,20 +124,18 @@ inline GeneratedStream generate_stream(
     assert(num_epochs > 1);
     assert(epoch_size > 0);
 
-    // --- Build flow list (1-indexed keys "1", "2", ..., num_flows) ---
     std::vector<std::string> flow_keys;
     flow_keys.reserve(num_flows);
     for (int i = 1; i <= num_flows; ++i)
         flow_keys.push_back(std::to_string(i));
 
-    // --- Zipf weights and per-epoch base packet counts ---
     std::vector<double> weights(num_flows);
     double weight_sum = 0.0;
     for (int i = 0; i < num_flows; ++i) {
         weights[i] = 1.0 / std::pow(static_cast<double>(i + 1), zipf_alpha);
         weight_sum += weights[i];
     }
-    // Base packet counts: round-robin remainder distribution to hit epoch_size.
+
     std::vector<int> base_counts(num_flows);
     {
         int allocated = 0;
@@ -160,19 +143,16 @@ inline GeneratedStream generate_stream(
             base_counts[i] = static_cast<int>(weights[i] / weight_sum * epoch_size);
             allocated += base_counts[i];
         }
-        // Distribute leftover to the heaviest flows.
+  
         int leftover = epoch_size - allocated;
         for (int i = 0; i < leftover; ++i) base_counts[i]++;
     }
 
-    // --- Build anomaly lookup by flow_id ---
+
     std::unordered_map<std::string, const AnomalySpec*> anomaly_map;
     for (const auto& a : anomaly_specs)
         anomaly_map[a.flow_id] = &a;
 
-    // --- Compute ground truth ---
-    // A boundary b (epoch b → b+1) is in GT for flow f if the distribution or
-    // packet count changes between epochs b and b+1 for flow f.
     GeneratedStream result;
     result.num_epochs     = num_epochs;
     result.epoch_duration = static_cast<double>(epoch_size);
@@ -197,14 +177,12 @@ inline GeneratedStream generate_stream(
         }
     }
 
-    // --- Generate packets ---
     std::mt19937 rng(seed);
     double epoch_duration = static_cast<double>(epoch_size);
 
     for (int e = 0; e < num_epochs; ++e) {
         double epoch_start = e * epoch_duration;
 
-        // Collect all packets for this epoch, then shuffle for realism.
         std::vector<std::pair<std::string, double>> epoch_pkts;
         epoch_pkts.reserve(epoch_size);
 
@@ -222,10 +200,8 @@ inline GeneratedStream generate_stream(
                 epoch_pkts.push_back({key, dist(rng)});
         }
 
-        // Shuffle within epoch so keys are interleaved.
         std::shuffle(epoch_pkts.begin(), epoch_pkts.end(), rng);
 
-        // Assign timestamps within [epoch_start, epoch_start + epoch_size).
         for (int i = 0; i < static_cast<int>(epoch_pkts.size()); ++i) {
             result.packets.push_back({
                 epoch_start + i,

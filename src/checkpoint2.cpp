@@ -1,19 +1,7 @@
 // Checkpoint 2 — Histogram-in-sketch accuracy on a Zipf + lognormal stream.
 //
-// Stream: 10 000 packets. Key = flow ID drawn from Zipf(alpha=1.5).
-//         Latency = drawn from lognormal(mu=1.6, sigma=0.4).
-//         Lognormal median ≈ exp(1.6) ≈ 5.0, values mostly in [1, 20].
-//
-// Bin configs tested:
-//   Uniform:     8 bins, [0, 30]  → bin width = 3.75
-//   Logarithmic: 8 bins, [0.5, 30]
-//
 // For each config: select the 3 highest-frequency keys, print ground truth,
 // estimated histograms, and per-bin errors.
-//
-// Expected: CMS and CU-CMS overestimate per bin (non-negative errors).
-//           CS errors are signed (both over and under per bin).
-//           CU-CMS errors smaller than CMS.
 
 #include <algorithm>
 #include <cmath>
@@ -30,7 +18,7 @@
 #include "sketches/cu_cms.hpp"
 #include "sketches/cs.hpp"
 
-// ---------------------------------------------------------------------------
+
 
 class ZipfDistribution {
     std::discrete_distribution<int> dist_;
@@ -44,11 +32,7 @@ public:
     int sample(std::mt19937& rng) { return dist_(rng) + 1; }
 };
 
-// ---------------------------------------------------------------------------
 
-// w=128 intentionally: with w=1024 per-bin collision noise rounds to 0 at
-// this stream size, hiding the over/under-estimation signal we want to verify.
-// The full evaluation sweeps w; 128 is just enough to make errors visible here.
 static void run_checkpoint(const BinConfig& cfg, const std::string& scheme_name,
                            const std::vector<std::pair<std::string, double>>& stream,
                            const std::map<std::string, std::vector<int>>& ground_truth,
@@ -80,7 +64,6 @@ static void run_checkpoint(const BinConfig& cfg, const std::string& scheme_name,
         for (int c : truth) true_count += c;
         std::cout << "\nFlow \"" << key << "\"  (true packet count = " << true_count << ")\n";
 
-        // Header
         std::cout << std::setw(5)  << "Bin"
                   << std::setw(18) << "Range"
                   << std::setw(8)  << "Truth"
@@ -94,7 +77,6 @@ static void run_checkpoint(const BinConfig& cfg, const std::string& scheme_name,
         std::cout << std::string(87, '-') << "\n";
 
         for (int b = 0; b < B; ++b) {
-            // Format bin range string.
             std::ostringstream range;
             range << std::fixed << std::setprecision(1)
                   << "[" << edges[b] << ", " << edges[b + 1] << ")";
@@ -113,13 +95,11 @@ static void run_checkpoint(const BinConfig& cfg, const std::string& scheme_name,
     }
 }
 
-// ---------------------------------------------------------------------------
-
 int main() {
     constexpr int      N_ITEMS    = 10'000;
-    constexpr int      N_MAX_KEY  = 1000;   // fewer unique keys → more load per key → visible collision noise
+    constexpr int      N_MAX_KEY  = 1000;   
     constexpr double   ZIPF_ALPHA = 1.5;
-    constexpr double   LN_MU     = 1.6;   // lognormal parameters (log-space)
+    constexpr double   LN_MU     = 1.6; 
     constexpr double   LN_SIGMA  = 0.4;
     constexpr uint32_t SEED       = 42;
 
@@ -127,8 +107,6 @@ int main() {
     ZipfDistribution               zipf(N_MAX_KEY, ZIPF_ALPHA);
     std::lognormal_distribution<double> latency_dist(LN_MU, LN_SIGMA);
 
-    // Build the stream and per-key ground truth histograms under both configs.
-    // We record raw (key, latency) pairs so we can replay for each bin scheme.
     std::vector<std::pair<std::string, double>> stream;
     stream.reserve(N_ITEMS);
     std::map<std::string, int> freq;
@@ -140,7 +118,6 @@ int main() {
         freq[key]++;
     }
 
-    // Pick the 3 highest-frequency keys.
     std::vector<std::pair<int, std::string>> sorted_freq;
     for (const auto& [k, c] : freq)
         sorted_freq.push_back({c, k});
@@ -158,7 +135,7 @@ int main() {
         std::cout << "\"" << k << "\" (" << freq[k] << ")  ";
     std::cout << "\n";
 
-    // --- Uniform bins ---
+    // uniform bins 
     BinConfig uniform_cfg(8, 0.0, 30.0, BinScheme::Uniform);
     {
         std::map<std::string, std::vector<int>> gt;
@@ -168,7 +145,7 @@ int main() {
         run_checkpoint(uniform_cfg, "Uniform [0, 30]", stream, gt, top_keys);
     }
 
-    // --- Logarithmic bins ---
+    // log bins 
     BinConfig log_cfg(8, 0.5, 30.0, BinScheme::Logarithmic);
     {
         std::map<std::string, std::vector<int>> gt;

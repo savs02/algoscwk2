@@ -1,26 +1,4 @@
-// Checkpoint 4 — Histogram differencing and heavy-changer detection.
-//
-// Two epochs, each with 1000 packets per flow:
-//   Flow X: lognormal(mu=log(5), sigma=1) in epoch 0  →  lognormal(mu=log(10), sigma=1) in epoch 1
-//   Flow Y: lognormal(mu=log(5), sigma=1) in both epochs  (stable)
-//
-// The differenced histogram for X (epoch 1 − epoch 0) should show:
-//   negative values in low bins  (fewer low-latency packets now)
-//   positive values in high bins (more high-latency packets now)
-//
-// Flow Y's diff should be close to zero across all bins.
-//
-// Detection thresholds:
-//   L1      > 300
-//   L2      > 120
-//   max-bin > 50
-// With N=1000 packets per flow and 10 bins, statistical variation between two
-// same-distribution samples produces scores far below these thresholds.
-// A genuine distribution shift (median 5→10) produces scores comfortably above
-// them, so flow X should be detected and flow Y should remain unflagged.
-//
-// All three sketch types are tested; CMS and CU-CMS should detect X cleanly;
-// CS has signed noise so scores may differ but the direction should hold.
+//Checkpoint 4 — Histogram differencing and heavy-changer detection
 
 #include <algorithm>
 #include <cmath>
@@ -41,8 +19,6 @@
 #include "temporal/epoch_manager.hpp"
 #include "temporal/stream_processor.hpp"
 #include "temporal/differencer.hpp"
-
-// ---------------------------------------------------------------------------
 
 struct DetectionThresholds {
     double l1;
@@ -69,7 +45,6 @@ static void print_diff_row(const std::string& label,
         range << std::fixed << std::setprecision(1)
               << "[" << edges[b] << "," << edges[b+1] << ")";
 
-        // Simple ASCII bar: '+' for positive, '-' for negative
         int bar_len = static_cast<int>(std::abs(diff[b]) / 5.0);
         bar_len = std::min(bar_len, 30);
         char bar_ch = diff[b] >= 0 ? '+' : '-';
@@ -83,7 +58,7 @@ static void print_diff_row(const std::string& label,
     }
 }
 
-// ---------------------------------------------------------------------------
+
 
 static bool run_checkpoint(
     const std::string& sketch_name,
@@ -99,9 +74,6 @@ static bool run_checkpoint(
 
     for (const auto& [timestamp, key, lat] : stream) proc.process(timestamp, key, lat);
 
-    // After two full epochs:
-    //   get_previous_sketch(0) = epoch 1 (current, most recent)
-    //   get_previous_sketch(1) = epoch 0
     const BaseSketch& epoch1 = em.get_previous_sketch(0);
     const BaseSketch& epoch0 = em.get_previous_sketch(1);
 
@@ -154,11 +126,10 @@ static bool run_checkpoint(
     return pass;
 }
 
-// ---------------------------------------------------------------------------
 
 int main() {
     constexpr int      N_PER_FLOW      = 1000;
-    constexpr int      ITEMS_PER_EPOCH = 2 * N_PER_FLOW;  // X + Y per epoch
+    constexpr int      ITEMS_PER_EPOCH = 2 * N_PER_FLOW;
     constexpr double   EPOCH_DURATION  = static_cast<double>(ITEMS_PER_EPOCH);
     constexpr int      W               = 1024;
     constexpr int      D               = 3;
@@ -167,17 +138,13 @@ int main() {
     const std::string  KEY_Y           = "Y";
     const DetectionThresholds thresholds{300.0, 120.0, 50.0};
 
-    // Log-spaced bins [0.5, 200]: covers lognormal(log(5),1) and lognormal(log(10),1).
-    // 5th–95th percentile of lognormal(log(5),1): [0.9, 27]; lognormal(log(10),1): [1.8, 55].
+    // log spaced bins
     BinConfig cfg(10, 0.5, 200.0, BinScheme::Logarithmic);
 
     std::mt19937 rng(SEED);
     std::lognormal_distribution<double> dist_low (std::log(5.0),  1.0);
     std::lognormal_distribution<double> dist_high(std::log(10.0), 1.0);
 
-    // Build a single timestamped stream:
-    //   epoch 0: X=low,  Y=low
-    //   epoch 1: X=high, Y=low
     auto make_stream = [&](std::lognormal_distribution<double>& dist_x,
                            std::lognormal_distribution<double>& dist_y,
                            double epoch_start)

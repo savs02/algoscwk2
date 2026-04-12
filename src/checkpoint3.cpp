@@ -1,18 +1,19 @@
-// Checkpoint 3 — Temporal snapshotting and epoch isolation.
-//
-// Stream: 4 time-based epochs × 2500 items = 10 000 total.
-// Input to the stream processor is explicit (timestamp, key, value) tuples.
-// Each epoch uses a different lognormal mean so histograms shift predictably:
-//   Epoch 0: mu=1.0 → median ≈  2.7  (low latency)
-//   Epoch 1: mu=1.5 → median ≈  4.5
-//   Epoch 2: mu=2.0 → median ≈  7.4
-//   Epoch 3: mu=2.5 → median ≈ 12.2  (high latency)
-//
-// Pass criteria (applied to all three sketch types: CMS, CU-CMS, CS)
-// ------------------------------------------------------------------
-//   1. items_processed == K * EPOCH_SIZE, snapshots_available == K.
-//   2. Histogram peak bins are non-decreasing across epochs.
-//   3. Each snapshot best-matches (L1) its own epoch's ground truth.
+"""
+Checkpoint 3 — Temporal snapshotting and epoch isolation.
+
+Stream: 4 time-based epochs × 2500 items = 10 000 total.
+Input to the stream processor is explicit (timestamp, key, value) tuples.
+Each epoch uses a different lognormal mean so histograms shift predictably:
+  Epoch 0: mu=1.0 → median ≈  2.7  (low latency)
+  Epoch 1: mu=1.5 → median ≈  4.5
+  Epoch 2: mu=2.0 → median ≈  7.4
+  Epoch 3: mu=2.5 → median ≈ 12.2  (high latency)
+
+Pass criteria (applied to all three sketch types: CMS, CU-CMS, CS)
+  1. items_processed == K * EPOCH_SIZE, snapshots_available == K.
+  2. Histogram peak bins are non-decreasing across epochs.
+  3. Each snapshot best-matches (L1) its own epoch's ground truth.
+"""
 
 #include <algorithm>
 #include <array>
@@ -35,7 +36,6 @@
 #include "temporal/epoch_manager.hpp"
 #include "temporal/stream_processor.hpp"
 
-// ---------------------------------------------------------------------------
 
 class ZipfDistribution {
     std::discrete_distribution<int> dist_;
@@ -49,10 +49,6 @@ public:
     int sample(std::mt19937& rng) { return dist_(rng) + 1; }
 };
 
-// ---------------------------------------------------------------------------
-// Run the isolation test for one sketch type.
-// Returns true if all three criteria pass.
-// ---------------------------------------------------------------------------
 
 static bool run_isolation_test(
     const std::string&                             sketch_name,
@@ -70,7 +66,6 @@ static bool run_isolation_test(
     for (const auto& [timestamp, key, lat] : stream)
         proc.process(timestamp, key, lat);
 
-    // Sanity checks.
     if (proc.items_processed() != K * EPOCH_SIZE) {
         std::cerr << sketch_name << ": FAIL — item count mismatch\n";
         return false;
@@ -88,7 +83,6 @@ static bool run_isolation_test(
     for (int e = 0; e < K; ++e)
         est[e] = epoch_mgr.get_previous_sketch(K - 1 - e).query_histogram(TEST_KEY);
 
-    // --- Print histogram table ---
     std::cout << "\n--- " << sketch_name << " ---\n";
     std::cout << std::setw(4) << "Bin" << std::setw(16) << "Range";
     for (int e = 0; e < K; ++e)
@@ -107,7 +101,7 @@ static bool run_isolation_test(
         std::cout << "\n";
     }
 
-    // --- Check A: monotone peak bins ---
+    // monotone peak bins
     bool monotone  = true;
     int  prev_peak = -1;
     std::cout << "\nCheck A (peak shift):\n";
@@ -123,7 +117,7 @@ static bool run_isolation_test(
         prev_peak = peak;
     }
 
-    // --- Check B: each snapshot best-matches its own ground truth (L1) ---
+    // L1
     bool best_match_ok = true;
     std::cout << "Check B (L1 self-match):\n";
     for (int e = 0; e < K; ++e) {
@@ -146,7 +140,6 @@ static bool run_isolation_test(
     return pass;
 }
 
-// ---------------------------------------------------------------------------
 
 int main() {
     constexpr int      K                      = 4;
@@ -163,7 +156,6 @@ int main() {
     const std::array<double, 4> mus   = {1.0, 1.5, 2.0, 2.5};
     constexpr double             SIGMA = 0.3;
 
-    // Generate the stream once; replay it for each sketch type.
     std::mt19937     rng(SEED);
     ZipfDistribution zipf(N_MAX_KEY, 1.5);
 

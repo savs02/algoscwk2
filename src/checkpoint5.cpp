@@ -1,20 +1,22 @@
-// Checkpoint 5 — Change type classification.
-//
-// Five synthetic change types are injected, one per test case.
-// For each case we run two epochs through all three sketch types and verify
-// that the classifier labels the changed flow correctly while leaving an
-// unchanged background flow classified as None.
-//
-// Change types and how they are synthesised:
-//   Disappearance  — flow X sends packets in epoch 0 but nothing in epoch 1
-//   VolumeChange   — same distribution, 3× more packets in epoch 1 than epoch 0
-//   Spike          — epoch 1 adds a concentrated burst at a single latency value
-//                    (only a narrow band of latency values, rest same as epoch 0)
-//   Shift          — lognormal mean doubles (5 → 10), same sigma
-//   Spread         — same mean, sigma doubles (0.5 → 1.0)
-//
-// Each case also includes a stable background flow Y. CMS, CU-CMS, and CS
-// must all classify X correctly and keep Y as None.
+"""
+Checkpoint 5 — Change type classification.
+
+Five synthetic change types are injected, one per test case.
+For each case we run two epochs through all three sketch types and verify
+that the classifier labels the changed flow correctly while leaving an
+unchanged background flow classified as None.
+
+Change types and how they are synthesised:
+  Disappearance  — flow X sends packets in epoch 0 but nothing in epoch 1
+  VolumeChange   — same distribution, 3× more packets in epoch 1 than epoch 0
+  Spike          — epoch 1 adds a concentrated burst at a single latency value
+                   (only a narrow band of latency values, rest same as epoch 0)
+  Shift          — lognormal mean doubles (5 → 10), same sigma
+  Spread         — same mean, sigma doubles (0.5 → 1.0)
+
+Each case also includes a stable background flow Y. CMS, CU-CMS, and CS
+must all classify X correctly and keep Y as None.
+"""
 
 #include <algorithm>
 #include <cmath>
@@ -36,7 +38,6 @@
 #include "temporal/differencer.hpp"
 #include "temporal/change_classifier.hpp"
 
-// ---------------------------------------------------------------------------
 
 struct TestCase {
     std::string                                           name;
@@ -50,12 +51,7 @@ struct SuiteSummary {
     int sketch_case_passed = 0;
 };
 
-// ---------------------------------------------------------------------------
-// Helper: build a timestamped stream for two epochs.
-//   ep1 starts at epoch_duration so the boundary fires exactly once.
-//   epoch_duration must be >= max(ep0.size(), ep1.size()) to prevent
-//   the stream processor from firing extra advances mid-epoch.
-// ---------------------------------------------------------------------------
+
 static std::vector<std::tuple<double, std::string, double>>
 make_stream(const std::vector<std::pair<std::string, double>>& ep0,
             const std::vector<std::pair<std::string, double>>& ep1,
@@ -70,9 +66,6 @@ make_stream(const std::vector<std::pair<std::string, double>>& ep0,
     return s;
 }
 
-// ---------------------------------------------------------------------------
-// Produce N lognormal samples for key.
-// ---------------------------------------------------------------------------
 static std::vector<std::pair<std::string, double>>
 lognormal_packets(const std::string& key, int N, double mu, double sigma,
                   std::mt19937& rng)
@@ -98,8 +91,7 @@ static std::vector<TestCase> build_test_cases(int N,
     std::mt19937 rng(seed);
     std::vector<TestCase> cases;
 
-    // --- Disappearance: X active in epoch 0, silent in epoch 1.
-    //     Y is stable background in both epochs. ---
+    // disappearance
     {
         std::vector<std::pair<std::string, double>> ep0;
         std::vector<std::pair<std::string, double>> ep1;
@@ -111,7 +103,7 @@ static std::vector<TestCase> build_test_cases(int N,
                          make_stream(ep0, ep1, ep_dur)});
     }
 
-    // --- VolumeChange: same distribution, 3× packets in epoch 1. ---
+    // volumeChange
     {
         std::vector<std::pair<std::string, double>> ep0;
         std::vector<std::pair<std::string, double>> ep1;
@@ -124,8 +116,7 @@ static std::vector<TestCase> build_test_cases(int N,
                          make_stream(ep0, ep1, ep_dur)});
     }
 
-    // --- Spike: epoch 0 normal; epoch 1 = epoch 0 baseline + concentrated
-    //     burst at latency ~30 ms (bin 7 of 10, log-spaced), narrow sigma. ---
+    // spike
     {
         std::vector<std::pair<std::string, double>> ep0;
         std::vector<std::pair<std::string, double>> ep1;
@@ -139,7 +130,7 @@ static std::vector<TestCase> build_test_cases(int N,
                          make_stream(ep0, ep1, ep_dur)});
     }
 
-    // --- Shift: mean doubles (log(5) → log(10)), same sigma ---
+    // shift
     {
         std::vector<std::pair<std::string, double>> ep0;
         std::vector<std::pair<std::string, double>> ep1;
@@ -152,7 +143,7 @@ static std::vector<TestCase> build_test_cases(int N,
                          make_stream(ep0, ep1, ep_dur)});
     }
 
-    // --- Spread: same mean, sigma doubles (0.5 → 1.0) ---
+    // spread
     {
         std::vector<std::pair<std::string, double>> ep0;
         std::vector<std::pair<std::string, double>> ep1;
@@ -168,11 +159,6 @@ static std::vector<TestCase> build_test_cases(int N,
     return cases;
 }
 
-// ---------------------------------------------------------------------------
-// Run one test case against one sketch type.
-// Returns true if the classifier matches the expected type for X and keeps
-// the unchanged background flow Y classified as None.
-// ---------------------------------------------------------------------------
 static bool run_one(const std::string& sketch_name,
                     const std::function<EpochManager::SketchPtr()>& factory,
                     const BinConfig& cfg,
@@ -259,23 +245,18 @@ static SuiteSummary run_suite(const std::vector<TestCase>& cases,
     return summary;
 }
 
-// ---------------------------------------------------------------------------
 
 int main() {
-    constexpr int      N         = 1000;   // packets per flow per epoch
+    constexpr int      N         = 1000;   
     constexpr int      W         = 1024;
     constexpr int      D         = 3;
     constexpr uint32_t SEED      = 42;
     const std::string  KEY_X     = "X";
-    const std::string  KEY_Y     = "Y";   // background flow (unchanged)
+    const std::string  KEY_Y     = "Y";   
 
-    // 10 log-spaced bins [0.5, 200] — same as checkpoint 4.
     BinConfig cfg(10, 0.5, 200.0, BinScheme::Logarithmic);
     auto cases = build_test_cases(N, SEED, KEY_X, KEY_Y);
 
-    // -----------------------------------------------------------------------
-    // Run all cases × all sketch types.
-    // -----------------------------------------------------------------------
     std::cout << "Checkpoint 5  |  Change type classification\n";
     std::cout << "w=" << W << ", d=" << D << ", N=" << N
               << ", bins=10 log-spaced [0.5, 200]\n";

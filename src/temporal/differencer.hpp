@@ -6,15 +6,13 @@
 #include <vector>
 #include "../sketches/base_sketch.hpp"
 
-// ---------------------------------------------------------------------------
 // Histogram differencing and change detection
-// ---------------------------------------------------------------------------
 
-// Per-flow change magnitude scores derived from a differenced histogram.
+
 struct ChangeScores {
-    double l1;       // sum |diff[b]|          — total absolute change
-    double l2;       // sqrt(sum diff[b]^2)    — emphasises large bin changes
-    double max_bin;  // max |diff[b]|          — single largest bin change
+    double l1;     
+    double l2;       
+    double max_bin;  
 };
 
 enum class ChangeMetric {
@@ -23,9 +21,6 @@ enum class ChangeMetric {
     MaxBin,
 };
 
-// Return hist_A[b] - hist_B[b] for each bin b.
-// Positive values: more packets in A than B for that latency range.
-// Negative values: fewer packets in A than B.
 inline std::vector<double> diff_histograms(
     const BaseSketch& sketch_A,
     const BaseSketch& sketch_B,
@@ -45,7 +40,7 @@ inline std::vector<double> diff_histograms(
     return diff;
 }
 
-// Compute L1, L2, and max-bin scores from a differenced histogram.
+// L1, L2, and max-bin scores from a dhs
 inline ChangeScores compute_scores(const std::vector<double>& diff) {
     double l1 = 0.0, l2_sq = 0.0, max_bin = 0.0;
     for (double d : diff) {
@@ -67,7 +62,7 @@ inline double score_for_metric(const ChangeScores& scores, ChangeMetric metric) 
     return 0.0;
 }
 
-// Flag as heavy distributional changer when the selected metric exceeds a threshold.
+// flag as heavy 
 inline bool is_heavy_changer(const ChangeScores& scores,
                              double threshold,
                              ChangeMetric metric = ChangeMetric::L1)

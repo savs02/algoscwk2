@@ -1,15 +1,13 @@
 // Differenced Histogram Sketch (DHS) — complete implementation.
 //
 // Runs all six stages in sequence:
-//   Stage 1  Basic sketch accuracy (informational)
-//   Stage 2  Histogram-in-sketch estimation accuracy (informational)
-//   Stage 3  Temporal snapshotting and epoch isolation (PASS/FAIL)
-//   Stage 4  Histogram differencing and heavy-changer detection (PASS/FAIL)
-//   Stage 5  Change type classification (PASS/FAIL)
-//   Stage 6  Synthetic stream generator and F1 evaluation (PASS/FAIL)
+//   Stage 1  Basic sketch accuracy 
+//   Stage 2  Histogram-in-sketch estimation accuracy 
+//   Stage 3  Temporal snapshotting and epoch isolation 
+//   Stage 4  Histogram differencing and heavy-changer detection 
+//   Stage 5  Change type classification 
+//   Stage 6  Synthetic stream generator and F1 evaluation 
 //
-// Build:  cmake --build build --target main
-// Run:    ./build/main
 
 #include <algorithm>
 #include <array>
@@ -40,9 +38,6 @@
 #include "temporal/change_classifier.hpp"
 #include "generator/stream_generator.hpp"
 
-// ============================================================================
-// Shared utility
-// ============================================================================
 
 class ZipfDistribution {
     std::discrete_distribution<int> dist_;
@@ -56,12 +51,6 @@ public:
     int sample(std::mt19937& rng) { return dist_(rng) + 1; }
 };
 
-// ============================================================================
-// Stage 1 — Basic sketch accuracy on a Zipf frequency stream
-//
-// A 1-bin BinConfig makes every update land in bin 0, so query() == frequency.
-// Expected: CMS overestimates, CU-CMS overestimates less, CS ≈ unbiased.
-// ============================================================================
 
 static void run_stage1() {
     constexpr int      W          = 1024;
@@ -130,12 +119,6 @@ static void run_stage1() {
               << "F1 scores under the current settings. Detector design dominates.\n";
 }
 
-// ============================================================================
-// Stage 2 — Histogram-in-sketch estimation accuracy
-//
-// Zipf keys, lognormal latencies. Shows per-bin truth vs estimate for the
-// top-3 flows under uniform and logarithmic bin configs.
-// ============================================================================
 
 static void run_stage2_scheme(const BinConfig& cfg, const std::string& scheme_name,
                                const std::vector<std::pair<std::string,double>>& stream,
@@ -239,13 +222,6 @@ static bool run_stage2() {
         if (gt_log.count(key)) gt_log[key][log_cfg.get_bin(lat)]++;
     run_stage2_scheme(log_cfg, "Logarithmic [0.5, 30]", stream, gt_log, top_keys);
 
-    // -----------------------------------------------------------------------
-    // Accuracy PASS/FAIL: run at w=64 (high collision pressure) so that
-    // sketch-type differences are visible.
-    // Pass criteria:
-    //   (1) CU-CMS avg absolute per-bin error < CMS avg absolute per-bin error
-    //   (2) CMS avg signed per-bin error > 0  (always overestimates)
-    // -----------------------------------------------------------------------
     constexpr int W_CHK = 64, D_CHK = 3;
     CountMinSketch        cms_c(W_CHK, D_CHK, log_cfg);
     ConservativeUpdateCMS cu_c (W_CHK, D_CHK, log_cfg);
@@ -295,13 +271,6 @@ static bool run_stage2() {
     return stage2_pass;
 }
 
-// ============================================================================
-// Stage 3 — Temporal snapshotting and epoch isolation
-//
-// 4 epochs × 2500 items, lognormal mu increasing each epoch.
-// Check A: histogram peak bins are non-decreasing across epochs.
-// Check B: each snapshot best-matches its own epoch's ground truth by L1.
-// ============================================================================
 
 static bool run_stage3_sketch(
     const std::string& sketch_name,
@@ -440,12 +409,7 @@ static bool run_stage3() {
     return all_pass;
 }
 
-// ============================================================================
-// Stage 4 — Histogram differencing and heavy-changer detection
-//
-// Flow X: lognormal mean shifts 5→10.  Flow Y: stable.
-// Checks L1, L2, and max-bin thresholds; X must be flagged, Y must not.
-// ============================================================================
+
 
 static void s4_print_diff_row(const std::string& label,
                                const std::vector<double>& diff,
@@ -489,11 +453,6 @@ static bool run_stage4_sketch(
     auto scores_x = compute_scores(diff_x);
     auto scores_y = compute_scores(diff_y);
 
-    // Derive thresholds from the stable flow Y's observed noise level.
-    // threshold = max(2 × Y_score, minimum). A 2× multiplier ensures Y never
-    // self-trips; X must show at least 2× the noise floor to pass.
-    // (For a 2× mean shift with N=1000 packets the observed SNR is ~3–4×,
-    // so 2× cleanly separates signal from noise in this configuration.)
     constexpr double NOISE_MULT = 2.0;
     double thr_l1  = std::max(scores_y.l1     * NOISE_MULT, 10.0);
     double thr_l2  = std::max(scores_y.l2     * NOISE_MULT,  5.0);
@@ -596,24 +555,6 @@ static bool run_stage4() {
 
     std::cout << "\n" << (all_pass ? "ALL PASS" : "SOME FAILED") << " — Stage 4\n";
 
-    // -----------------------------------------------------------------------
-    // Experiment: Hash-rotation residual bias sweep
-    //
-    // When hash seeds differ between epochs the bias no longer cancels.
-    // This is the only setting in DHS where sketch type matters for detection.
-    //
-    // Setup (independent of the Stage 4 main test):
-    //   w=64, d=3, 200 Zipf flows (alpha=1.5), N=5000 packets, 10 log bins
-    //   IDENTICAL data fed into both epoch sketches each trial so all L1
-    //   is pure sketch residual — no sampling variance.
-    //   Same-seed L1 = 0 always (sanity check).
-    //
-    // Sweep: 10 seed pairs (s, s+1) for s = 0..9.
-    //   For each pair and each sketch type, record residual L1 for two flows:
-    //     "1"  — heaviest Zipf flow (~2700 packets)
-    //     "10" — lighter flow (~200 packets)
-    //   Report mean ± std across the 10 pairs.
-    // -----------------------------------------------------------------------
     {
         constexpr int    XS_W      = 64;
         constexpr int    XS_D      = 3;
@@ -730,12 +671,6 @@ static bool run_stage4() {
     return all_pass;
 }
 
-// ============================================================================
-// Stage 5 — Change type classification
-//
-// Five synthetic change types injected into a two-epoch stream.
-// For each: the classifier must label flow X correctly and keep flow Y as None.
-// ============================================================================
 
 struct S5TestCase {
     std::string                                          name;
@@ -898,14 +833,11 @@ static bool run_stage5() {
               << "shape against five empirical patterns. It is validated on synthetic cases\n"
               << "below and does not carry formal guarantees outside that regime.\n\n";
 
-    // Primary run on seed 42 (verbose — the seed used when developing the heuristic rules).
     auto cases = s5_build_cases(N, SEED);
     auto clean = s5_run_suite(cases, W, D, cfg, true);
     bool all_pass = (clean.passed == clean.total);
     std::cout << (all_pass ? "ALL PASS" : "SOME FAILED") << " (seed 42)\n";
 
-    // Cross-seed validation: also gate on seeds 43 and 44 to guard against the
-    // classifier being implicitly tuned to seed 42's specific samples.
     std::cout << "\n  Cross-seed validation (seeds 43 and 44, N=" << N << "):\n";
     for (uint32_t xseed : {43u, 44u}) {
         auto xc = s5_build_cases(N, xseed);
@@ -917,7 +849,6 @@ static bool run_stage5() {
     }
     std::cout << (all_pass ? "ALL PASS" : "SOME FAILED") << "\n";
 
-    // Informational robustness sweep.
     std::cout << "\n  Robustness sweep (informational only)\n";
     std::cout << "  Sweeps width, packets-per-flow N, and seed to find where\n"
               << "  the classifier starts failing. Not part of checkpoint gating.\n\n";
@@ -930,7 +861,7 @@ static bool run_stage5() {
               << std::setw(12) << "Accuracy\n"
               << "  " << std::string(60, '-') << "\n";
     for (int w : {1024, 128}) {
-        for (int n_sweep : {N, N/5, N/10}) {  // 1000, 200, 100
+        for (int n_sweep : {N, N/5, N/10}) { 
             for (uint32_t seed : {42u, 43u, 44u}) {
                 auto sc = s5_build_cases(n_sweep, seed);
                 auto sm = s5_run_suite(sc, w, D, cfg, false);
@@ -950,12 +881,6 @@ static bool run_stage5() {
     return all_pass;
 }
 
-// ============================================================================
-// Stage 6 — Synthetic stream generator and F1 evaluation
-//
-// 100 Zipf flows, 4 epochs, 5 anomaly types injected on the heaviest flows.
-// Detection: L1 > 300 threshold. Pass criterion: F1 >= 0.7 per sketch type.
-// ============================================================================
 
 struct S6DetectionResult {
     int tp = 0, fp = 0, fn = 0;
@@ -967,8 +892,6 @@ struct S6DetectionResult {
     }
 };
 
-// Detection mode: RawL1 uses a single absolute threshold; NormalisedL1 normalises
-// by the baseline count of each flow so lighter flows are not disadvantaged.
 enum class S6DetectionMode { RawL1, NormalisedL1 };
 
 static S6DetectionResult run_stage6_detection(
@@ -977,8 +900,8 @@ static S6DetectionResult run_stage6_detection(
     const GeneratedStream& gs,
     const BinConfig& cfg,
     S6DetectionMode mode,
-    double threshold,    // raw L1 threshold (RawL1) or normalised threshold (NormalisedL1)
-    double abs_floor,    // ignored for RawL1; minimum raw L1 for NormalisedL1
+    double threshold,  
+    double abs_floor, 
     const std::vector<AnomalySpec>& anomaly_specs,
     bool verbose)
 {
@@ -1073,16 +996,10 @@ static bool run_stage6() {
     constexpr int      W          = 1024;
     constexpr int      D          = 3;
     constexpr uint32_t SEED       = 42;
-    // Baseline detector: raw L1 > 300 (original checkpoint threshold).
     constexpr double   RAW_L1_THRESH  = 300.0;
-    // Improved detector: L1/baseline > threshold AND raw L1 > ABS_FLOOR.
-    // Threshold is selected on validation seeds 42-43 before any reporting.
     constexpr double   ABS_FLOOR      = 30.0;
     const double       BASE_MU        = std::log(5.0);
 
-    // Anomaly magnitudes are explicit — no silent defaults.
-    // GradualRamp kept at 1.2 (original checkpoint value) so anomaly difficulty
-    // is identical between baseline and improved runs.
     BinConfig cfg(10, 0.5, 200.0, BinScheme::Logarithmic);
     std::vector<AnomalySpec> anomalies = {
         {"1", AnomalyType::SuddenSpike,   1, 2.0},
@@ -1110,9 +1027,6 @@ static bool run_stage6() {
     for (const auto& g : gs.ground_truth)
         std::cout << "  flow=" << g.flow_id << " boundary=" << g.boundary << "\n";
 
-    // -----------------------------------------------------------------------
-    // Run 1 — Baseline: raw L1 threshold (original checkpoint decision rule)
-    // -----------------------------------------------------------------------
     std::cout << "\n--- Baseline detector (raw L1 > " << RAW_L1_THRESH << ") ---\n";
     bool baseline_pass = true;
     for (const auto& [sname, factory] : std::vector<std::pair<std::string,
@@ -1130,12 +1044,6 @@ static bool run_stage6() {
     }
     std::cout << (baseline_pass ? "Baseline: ALL PASS" : "Baseline: SOME FAILED") << "\n";
 
-    // -----------------------------------------------------------------------
-    // Threshold selection (runs before any reporting so the improved detector
-    // uses a validated threshold rather than a hardcoded one).
-    // Validation seeds: 42, 43 — sweep over candidate normalised thresholds.
-    // Test seed: 44 — held out, used only in the improved-detector report below.
-    // -----------------------------------------------------------------------
     std::cout << "\n--- Threshold selection (validation seeds 42-43) ---\n";
     std::cout << "Tuning normalised threshold on seeds 42-43 (avg F1 across 3 sketches):\n";
 
@@ -1169,15 +1077,8 @@ static bool run_stage6() {
     std::cout << "Selected: thresh=" << std::fixed << std::setprecision(2) << best_thresh
               << "  val_avg_F1=" << std::fixed << std::setprecision(3) << best_val_f1 << "\n";
 
-    // Gate on baseline passing (as the original checkpoint criterion).
-    // Improved is reported for comparison but does not gate the result.
     bool all_pass = baseline_pass;
 
-    // -----------------------------------------------------------------------
-    // Run 2 — Improved: normalised L1 detector with the validated threshold.
-    // Only the decision rule changes; anomaly setup is identical to baseline.
-    // Reported on held-out seed 44 (not used in threshold selection above).
-    // -----------------------------------------------------------------------
     auto test_gs = generate_stream(NUM_FLOWS, NUM_EPOCHS, EPOCH_SIZE,
                                     ZIPF_ALPHA, BASE_MU, BASE_SIGMA, anomalies, 44u);
     std::cout << "\n--- Improved detector (L1/baseline > " << std::fixed << std::setprecision(2)
@@ -1197,15 +1098,6 @@ static bool run_stage6() {
                   << "  F1=" << std::fixed << std::setprecision(3) << res.f1() << "\n";
     }
 
-    // -----------------------------------------------------------------------
-    // Ablation: component analysis on seed=42 with a fixed threshold=0.15.
-    // Purpose: show what each component contributes in isolation.
-    // The validated threshold above may differ; this section uses 0.15 so the
-    // three variants (A/B/C) are directly comparable to each other.
-    //   A — Raw L1 > 300          (baseline, no normalisation)
-    //   B — L1/baseline > 0.15    (normalisation only, no absolute floor)
-    //   C — L1/baseline > 0.15 && L1_raw > 30  (normalisation + floor)
-    // -----------------------------------------------------------------------
     struct AblationVariant { std::string label; S6DetectionMode mode; double thr, floor; };
     std::cout << "\n--- Ablation: component analysis (seed=42, w=1024, fixed thresh=0.15) ---\n";
     std::cout << "Fixed threshold=0.15 used here so A/B/C are directly comparable.\n"
@@ -1242,18 +1134,13 @@ static bool run_stage6() {
     return all_pass;
 }
 
-// ============================================================================
-// main
-// ============================================================================
 
 int main() {
     std::cout << "Differenced Histogram Sketch — full pipeline\n"
               << std::string(50, '=') << "\n";
 
-    // Stage 1 is informational only.
     run_stage1();
 
-    // Stages 2–6 have explicit pass/fail criteria.
     bool pass = true;
     pass &= run_stage2();
     pass &= run_stage3();

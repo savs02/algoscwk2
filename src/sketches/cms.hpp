@@ -4,17 +4,6 @@
 #include <vector>
 #include "base_sketch.hpp"
 
-// ---------------------------------------------------------------------------
-// CountMinSketch (CMS) — histogram variant
-//
-// counters_[row][bucket][bin]  — 3-D array of int32_t.
-//
-// update : get_bin(value) → b; for each row j, counters[j][hash_j(key)][b] += 1
-// query  : for each bin b, estimated count = min_j counters[j][hash_j(key)][b]
-//
-// Always overestimates per bin — collisions only add positive noise.
-// ---------------------------------------------------------------------------
-
 class CountMinSketch : public BaseSketch {
     std::vector<std::vector<std::vector<int32_t>>> counters_;
 

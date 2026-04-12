@@ -4,19 +4,6 @@
 #include <vector>
 #include "base_sketch.hpp"
 
-// ---------------------------------------------------------------------------
-// CountSketch (CS) — histogram variant
-//
-// update : b = get_bin(value)
-//          for each row j: counters[j][hash_j(key)][b] += sign_j(key)
-//
-// query  : for each bin b:
-//            row_estimate_j = counters[j][hash_j(key)][b] * sign_j(key)
-//            bin_estimate   = median over j of row_estimate_j
-//
-// Signed increments mean collisions partially cancel in expectation, giving
-// unbiased but higher-variance estimates relative to CMS.
-// ---------------------------------------------------------------------------
 
 class CountSketch : public BaseSketch {
     std::vector<std::vector<std::vector<int32_t>>> counters_;
