@@ -1,10 +1,5 @@
 # Differenced Histogram Sketch (DHS)
 
-COMP0252 Algorithms for Data Science — Coursework 2
-Submission deadline: 16 April 2026
-
----
-
 ## Problem Statement
 
 Modern network monitoring must cope with millions of flows per second. The central question for this project is:
