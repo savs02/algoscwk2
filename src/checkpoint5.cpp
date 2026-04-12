@@ -1,5 +1,5 @@
-"""
-Checkpoint 5 — Change type classification.
+/*
+Checkpoint 5 - Change type classification.
 
 Five synthetic change types are injected, one per test case.
 For each case we run two epochs through all three sketch types and verify
@@ -7,16 +7,16 @@ that the classifier labels the changed flow correctly while leaving an
 unchanged background flow classified as None.
 
 Change types and how they are synthesised:
-  Disappearance  — flow X sends packets in epoch 0 but nothing in epoch 1
-  VolumeChange   — same distribution, 3× more packets in epoch 1 than epoch 0
-  Spike          — epoch 1 adds a concentrated burst at a single latency value
+  Disappearance  - flow X sends packets in epoch 0 but nothing in epoch 1
+  VolumeChange   - same distribution, 3x more packets in epoch 1 than epoch 0
+  Spike          - epoch 1 adds a concentrated burst at a single latency value
                    (only a narrow band of latency values, rest same as epoch 0)
-  Shift          — lognormal mean doubles (5 → 10), same sigma
-  Spread         — same mean, sigma doubles (0.5 → 1.0)
+  Shift          - lognormal mean doubles (5 -> 10), same sigma
+  Spread         - same mean, sigma doubles (0.5 -> 1.0)
 
 Each case also includes a stable background flow Y. CMS, CU-CMS, and CS
 must all classify X correctly and keep Y as None.
-"""
+*/
 
 #include <algorithm>
 #include <cmath>

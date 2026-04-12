@@ -1,15 +1,15 @@
-"""
-Checkpoint 6 — Synthetic stream generator and F1 evaluation.
+/*
+Checkpoint 6 - Synthetic stream generator and F1 evaluation.
 
-Stream: 100 Zipf flows, 4 epochs × 5000 packets = 20 000 total.
+Stream: 100 Zipf flows, 4 epochs x 5000 packets = 20 000 total.
 Five anomaly flows are injected (one per type, assigned to the 5 heaviest flows
 so they have enough packets to reliably detect):
 
-  Flow 1 — SuddenSpike   : mean doubles for epoch 1 only, returns to normal
-  Flow 2 — GradualRamp   : mean grows ×1.2 per epoch from epoch 1
-  Flow 3 — PeriodicBurst : alternates high/normal from epoch 1
-  Flow 4 — Spread        : sigma doubles from epoch 1 onward
-  Flow 5 — Disappearance : no packets from epoch 1 onward
+  Flow 1 - SuddenSpike   : mean doubles for epoch 1 only, returns to normal
+  Flow 2 - GradualRamp   : mean grows x1.2 per epoch from epoch 1
+  Flow 3 - PeriodicBurst : alternates high/normal from epoch 1
+  Flow 4 - Spread        : sigma doubles from epoch 1 onward
+  Flow 5 - Disappearance : no packets from epoch 1 onward
 
 Ground truth: (flow_id, boundary) pairs where the distribution changes
 between adjacent epochs.
@@ -17,7 +17,7 @@ between adjacent epochs.
 Detection: for each sketch type, for every adjacent epoch pair, query each
 flow and flag as a heavy changer if L1 > threshold.
 
-"""
+*/
 
 #include <algorithm>
 #include <cmath>

@@ -76,7 +76,6 @@ def plot_baseline_vs_improved():
         order=SKETCH_ORDER,
         errorbar="sd",
         capsize=0.12,
-        err_kws={"linewidth": 1.2},
         palette={"Baseline (raw L1 > 300)": "#0f4c5c",
                  "Improved (normalised L1)": "#e36414"},
     )
@@ -179,7 +178,6 @@ def plot_per_type_breakdown():
         order=type_order,
         errorbar="sd",
         capsize=0.1,
-        err_kws={"linewidth": 1.2},
         palette={"Baseline": "#0f4c5c", "Improved": "#e36414"},
     )
     plt.ylim(0, 1.05)
@@ -204,7 +202,6 @@ def plot_per_type_breakdown():
         aspect=1.05,
         errorbar="sd",
         capsize=0.12,
-        err_kws={"linewidth": 1.0},
         palette={"Baseline": "#0f4c5c", "Improved": "#e36414"},
         legend_out=False,
     )
@@ -307,7 +304,6 @@ def plot_bin_scheme():
         hue_order=SKETCH_ORDER,
         errorbar="sd",
         capsize=0.1,
-        err_kws={"linewidth": 1.2},
         palette=SKETCH_COLORS,
     )
     plt.ylim(0, 1.05)
@@ -473,7 +469,6 @@ def plot_grey_failure():
         order=label_order,
         errorbar="sd",
         capsize=0.12,
-        err_kws={"linewidth": 1.2},
         palette={"DHS (histogram)": "#e36414", "Scalar count-diff": "#0f4c5c"},
     )
     plt.ylim(0, 1.25)

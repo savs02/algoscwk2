@@ -1,1 +1,1 @@
-/usr/bin/c++ -O2 -Wl,--dependency-file=CMakeFiles/checkpoint6.dir/link.d CMakeFiles/checkpoint6.dir/src/checkpoint6.cpp.o -o checkpoint6
+/usr/bin/c++ -O2 -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/checkpoint6.dir/src/checkpoint6.cpp.o -o checkpoint6

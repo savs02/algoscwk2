@@ -4,7 +4,7 @@
 #include <string>
 #include "epoch_manager.hpp"
 
-"""
+/*
 StreamProcessor
 
 Feeds a stream of packets into an EpochManager, advancing the epoch
@@ -20,14 +20,14 @@ Item-count mode (default)
   (fires on the FIRST call of the new epoch) so a completed epoch's sketch
   is stable and queryable between epochs.
 
-Timestamp mode 
+Timestamp mode
   StreamProcessor proc(epoch_mgr, epoch_duration_seconds);
   proc.process(timestamp, key, value);
 
   Advances when `timestamp >= epoch_start + epoch_duration`.  The epoch
   start is anchored to the first timestamp seen.  Consecutive advances
   are possible if a large gap exists between packets.
-  """
+*/
 
 
 class StreamProcessor {

@@ -6,17 +6,17 @@
 #include <vector>
 
 
-"""
+/*
 Change type classification from a differenced histogram.
 
 Five types (plus None when no significant change is detected):
 
-  Disappearance  — all bins are negative (flow stopped)
-  VolumeChange   — bins all same sign and roughly proportional
-  Spike          — one or two adjacent bins dominate (large positive), rest near zero
-  Shift          — low bins negative AND high bins positive (or vice versa)
-  Spread         — centre bins negative, tail bins positive (distribution widened)
-"""
+  Disappearance  - all bins are negative (flow stopped)
+  VolumeChange   - bins all same sign and roughly proportional
+  Spike          - one or two adjacent bins dominate (large positive), rest near zero
+  Shift          - low bins negative AND high bins positive (or vice versa)
+  Spread         - centre bins negative, tail bins positive (distribution widened)
+*/
 
 
 enum class ChangeType {

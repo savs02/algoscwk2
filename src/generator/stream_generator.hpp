@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-"""
+/*
 Synthetic multi-epoch stream generator
 
 Produces a stream of (timestamp, flow_key, latency) tuples that can be
@@ -20,15 +20,15 @@ Background traffic:
   fraction proportional to 1/i^alpha of the epoch_size total packets.
 
 Anomaly injection (6b anomaly types):
-  SuddenSpike   — mean doubles for exactly one epoch, then returns to normal
-  GradualRamp   — mean multiplied by 1.2^k each epoch k steps after start
-  PeriodicBurst — alternates between high (mean×2) and normal every epoch
-  Spread        — sigma doubles from start_epoch onward
-  Disappearance — flow stops sending from start_epoch onward
+  SuddenSpike   - mean doubles for exactly one epoch, then returns to normal
+  GradualRamp   - mean multiplied by 1.2^k each epoch k steps after start
+  PeriodicBurst - alternates between high (mean*2) and normal every epoch
+  Spread        - sigma doubles from start_epoch onward
+  Disappearance - flow stops sending from start_epoch onward
 
 Ground truth: the set of (flow_id, boundary_index) where the distribution
 changes between adjacent epochs.  A boundary at index b covers epoch b -> b+1.
-"""
+*/
 
 enum class AnomalyType {
     SuddenSpike,

@@ -1,19 +1,19 @@
-"""
-Checkpoint 3 — Temporal snapshotting and epoch isolation.
+/*
+Checkpoint 3 - Temporal snapshotting and epoch isolation.
 
-Stream: 4 time-based epochs × 2500 items = 10 000 total.
+Stream: 4 time-based epochs x 2500 items = 10 000 total.
 Input to the stream processor is explicit (timestamp, key, value) tuples.
 Each epoch uses a different lognormal mean so histograms shift predictably:
-  Epoch 0: mu=1.0 → median ≈  2.7  (low latency)
-  Epoch 1: mu=1.5 → median ≈  4.5
-  Epoch 2: mu=2.0 → median ≈  7.4
-  Epoch 3: mu=2.5 → median ≈ 12.2  (high latency)
+  Epoch 0: mu=1.0 -> median ~  2.7  (low latency)
+  Epoch 1: mu=1.5 -> median ~  4.5
+  Epoch 2: mu=2.0 -> median ~  7.4
+  Epoch 3: mu=2.5 -> median ~ 12.2  (high latency)
 
 Pass criteria (applied to all three sketch types: CMS, CU-CMS, CS)
   1. items_processed == K * EPOCH_SIZE, snapshots_available == K.
   2. Histogram peak bins are non-decreasing across epochs.
   3. Each snapshot best-matches (L1) its own epoch's ground truth.
-"""
+*/
 
 #include <algorithm>
 #include <array>

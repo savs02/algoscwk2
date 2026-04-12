@@ -5,7 +5,7 @@
 #include <vector>
 #include "../sketches/base_sketch.hpp"
 
-"""
+/*
 EpochManager
 
 Maintains a ring buffer of K histogram-sketch snapshots.  Each slot holds
@@ -13,7 +13,7 @@ the data from one time epoch.  When advance_epoch() is called, the next
 slot is claimed and filled with a fresh sketch (the factory function is
 called to construct it), overwriting the oldest epoch once the buffer is
 full.
-"""
+*/
 
 
 class EpochManager {
