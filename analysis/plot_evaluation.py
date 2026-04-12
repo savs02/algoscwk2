@@ -380,15 +380,141 @@ def plot_classifier_accuracy():
 
 
 def plot_confusion():
-    df = pd.read_csv(EVAL_DIR / "classifier_confusion_matrix.csv")
+    path = EVAL_DIR / "classifier_confusion_matrix.csv"
+    if not path.exists():
+        return None
+    df = pd.read_csv(path)
     if df.empty:
         return df
-    pivot = df.pivot(index="expected", columns="predicted", values="count").fillna(0)
-    plt.figure(figsize=(6, 5))
-    sns.heatmap(pivot, annot=True, fmt=".0f", cmap="Blues")
-    plt.title("Classifier Confusion Matrix (N=1000 aggregate)")
-    savefig("classifier_confusion_matrix.png")
+
+    type_order = ["Disappearance", "VolumeChange", "Spike", "Shift", "Spread"]
+
+    if "sketch" in df.columns:
+        # Per-sketch version: one heatmap per sketch type
+        fig, axes = plt.subplots(1, 3, figsize=(17, 5))
+        for ax, sketch in zip(axes, SKETCH_ORDER):
+            sub = df[df["sketch"] == sketch]
+            pivot = (sub.groupby(["expected", "predicted"])["count"]
+                       .sum()
+                       .unstack(fill_value=0))
+            row_ord = [t for t in type_order if t in pivot.index]
+            col_ord = [t for t in type_order if t in pivot.columns]
+            pivot = pivot.reindex(index=row_ord, columns=col_ord, fill_value=0)
+            sns.heatmap(pivot, annot=True, fmt=".0f", cmap="Blues",
+                        ax=ax, cbar=False, linewidths=0.4)
+            ax.set_title(sketch, fontsize=13, fontweight="bold")
+            ax.set_xlabel("Predicted")
+            ax.set_ylabel("Expected" if sketch == SKETCH_ORDER[0] else "")
+            for lbl in ax.get_xticklabels():
+                lbl.set_rotation(30)
+                lbl.set_ha("right")
+        fig.suptitle("Classifier Confusion Matrix per Sketch  (N=1000 aggregate, 3 seeds)",
+                     fontweight="bold", y=1.02)
+        plt.tight_layout()
+        plt.savefig(PLOTS_DIR / "classifier_confusion_matrix.png",
+                    dpi=180, bbox_inches="tight")
+        plt.close(fig)
+    else:
+        # Legacy: single aggregated heatmap
+        pivot = df.pivot(index="expected", columns="predicted", values="count").fillna(0)
+        plt.figure(figsize=(6, 5))
+        sns.heatmap(pivot, annot=True, fmt=".0f", cmap="Blues")
+        plt.title("Classifier Confusion Matrix (N=1000 aggregate)")
+        savefig("classifier_confusion_matrix.png")
     return df
+
+
+def plot_flow_count_sweep():
+    path = EVAL_DIR / "flow_count_sweep.csv"
+    if not path.exists():
+        return None
+    df = pd.read_csv(path)
+    if df.empty:
+        return df
+    summary = aggregate(df, ["sketch", "num_flows"])
+    draw_sketch_lines(
+        summary,
+        "num_flows",
+        "F1 vs Flow Count  (width=1024 fixed — collision pressure stress test)",
+        "flow_count_sweep.png",
+        "Mean F1",
+        ylim=(0, 1.05),
+        legend_kwargs=dict(title="Sketch", loc="lower left",
+                           fontsize="small", title_fontsize="small"),
+    )
+    return summary
+
+
+def plot_grey_failure():
+    path = EVAL_DIR / "grey_failure_comparison.csv"
+    if not path.exists():
+        return None
+    df = pd.read_csv(path)
+    if df.empty:
+        return df
+
+    # --- Detection-rate bar chart ---
+    long_rows = []
+    for _, row in df.iterrows():
+        long_rows.append({"sketch": row["sketch"], "scenario": row["scenario"],
+                          "method": "DHS (histogram)", "detected": row["detected_dhs"]})
+        long_rows.append({"sketch": row["sketch"], "scenario": row["scenario"],
+                          "method": "Scalar count-diff", "detected": row["detected_scalar"]})
+    ldf = pd.DataFrame(long_rows)
+
+    scenario_order = ["LatencySpike", "Spread", "GradualRamp"]
+    scenario_order = [s for s in scenario_order if s in ldf["scenario"].unique()]
+    scenario_labels = {"LatencySpike": "Latency\nSpike (10×)",
+                       "Spread":       "Spread\n(σ × 3)",
+                       "GradualRamp":  "Gradual\nRamp (×1.5/ep)"}
+    ldf["scenario_label"] = ldf["scenario"].map(scenario_labels).fillna(ldf["scenario"])
+    label_order = [scenario_labels.get(s, s) for s in scenario_order]
+
+    plt.figure(figsize=(9, 5.2))
+    n_seeds = df["seed"].nunique()
+    sns.barplot(
+        data=ldf,
+        x="scenario_label",
+        y="detected",
+        hue="method",
+        order=label_order,
+        errorbar="sd",
+        capsize=0.12,
+        err_kws={"linewidth": 1.2},
+        palette={"DHS (histogram)": "#e36414", "Scalar count-diff": "#0f4c5c"},
+    )
+    plt.ylim(0, 1.25)
+    plt.ylabel(f"Detection Rate\n(mean ± std, 3 sketches × {n_seeds} seeds)")
+    plt.xlabel("Grey Failure Type  (volume stable, latency distribution shifts)")
+    plt.title("DHS vs Scalar Heavy-Changer on Grey Failures")
+    plt.legend(title="Detector", loc="upper right")
+    plt.grid(axis="y", alpha=0.25)
+    savefig("grey_failure_comparison.png")
+
+    # --- Scatter: L1 score vs count ratio, annotated with detector thresholds ---
+    scenario_colors = dict(zip(scenario_order,
+                               ["#e36414", "#5f0f40", "#0f4c5c"]))
+    plt.figure(figsize=(8, 5))
+    ax = plt.gca()
+    for scen in scenario_order:
+        sub = df[df["scenario"] == scen]
+        ax.scatter(sub["count_ratio"], sub["l1"],
+                   label=scenario_labels.get(scen, scen),
+                   color=scenario_colors.get(scen, "#888"),
+                   s=55, alpha=0.75, edgecolors="#1f1f1f", linewidths=0.5)
+    ax.axhline(y=30.0, color="#cc0000", linestyle="--", linewidth=1.4,
+               label="DHS abs floor (L1=30)")
+    ax.axvline(x=0.30, color="#555555", linestyle=":", linewidth=1.4,
+               label="Scalar threshold (30% count change)")
+    ax.set_xlabel("|Δcount| / old_count   (what scalar detector sees)")
+    ax.set_ylabel("Histogram L1 score   (what DHS sees)")
+    ax.set_title("Grey Failure: High L1, Low Count Ratio")
+    ax.legend(fontsize="small", loc="upper right")
+    ax.grid(alpha=0.25)
+    ax.set_axisbelow(True)
+    savefig("grey_failure_scatter.png")
+
+    return ldf
 
 
 def write_summary(threshold_summary, bins_summary, snapshots_summary, zipf_summary,
@@ -523,11 +649,13 @@ def main():
         "epoch_sweep.csv", "epoch_size", "Epoch Size Sweep", "epoch_sweep.png", ylim=None, legend_kwargs=mid_legend_kwargs
     )
 
-    memory_summary = plot_memory_sweep()   # add this line
+    memory_summary = plot_memory_sweep()
     bin_scheme_summary = plot_bin_scheme()
     hash_rotation_df = plot_hash_rotation()
     classifier_summary = plot_classifier_accuracy()
     plot_confusion()
+    plot_flow_count_sweep()
+    plot_grey_failure()
     write_summary(
         threshold_summary,
         bins_summary,

@@ -837,7 +837,8 @@ static void run_classification_evaluation(const fs::path& out_dir) {
     std::ofstream acc_out(out_dir / "classifier_accuracy_vs_n.csv");
     acc_out << "sketch,n_packets,seed,accuracy,background_none_rate\n";
 
-    std::map<std::pair<std::string, std::string>, int> confusion;
+    // Key: {sketch, expected, predicted}
+    std::map<std::tuple<std::string, std::string, std::string>, int> confusion;
     for (int n : {100, 200, 500, 1000}) {
         for (uint32_t seed : {42u, 43u, 44u}) {
             auto cases = build_classification_cases(n, seed);
@@ -849,7 +850,8 @@ static void run_classification_evaluation(const fs::path& out_dir) {
                     if (pred_x == test_case.expected) ++correct;
                     if (pred_y == ChangeType::None) ++bg_none;
                     if (n == 1000) {
-                        confusion[{change_type_name(test_case.expected),
+                        confusion[{sketch_name(kind),
+                                   change_type_name(test_case.expected),
                                    change_type_name(pred_x)}]++;
                     }
                 }
@@ -862,9 +864,126 @@ static void run_classification_evaluation(const fs::path& out_dir) {
     }
 
     std::ofstream conf_out(out_dir / "classifier_confusion_matrix.csv");
-    conf_out << "expected,predicted,count\n";
+    conf_out << "sketch,expected,predicted,count\n";
     for (const auto& [key, count] : confusion)
-        conf_out << key.first << "," << key.second << "," << count << "\n";
+        conf_out << std::get<0>(key) << "," << std::get<1>(key) << ","
+                 << std::get<2>(key) << "," << count << "\n";
+}
+
+// Experiment 1: Flow count sweep (100 to 10k).
+// Tests whether sketch equivalence holds under heavier collision load.
+// Width is held fixed at 1024 so that increasing num_flows directly
+// increases per-bucket collision pressure without any other confound.
+static void run_flow_count_sweep(const fs::path& out_dir, const DetectorConfig& detector) {
+    constexpr int width = 1024;
+    constexpr int depth = 3;
+    constexpr int bins = 10;
+    constexpr int snapshots = 4;
+    constexpr int num_epochs = 4;
+    constexpr int epoch_size = 5000;
+    constexpr double zipf_alpha = 1.5;
+    const std::vector<uint32_t> seeds = {42, 43, 44};
+    const std::vector<int> flow_counts = {100, 500, 1000, 5000, 10000};
+
+    BinConfig cfg(bins, 0.5, 200.0, BinScheme::Logarithmic);
+    std::ofstream out(out_dir / "flow_count_sweep.csv");
+    out << "sketch,num_flows,seed,tp,fp,fn,f1\n";
+
+    for (int num_flows : flow_counts) {
+        for (uint32_t seed : seeds) {
+            auto gs = make_eval_stream(num_flows, num_epochs, epoch_size,
+                                       zipf_alpha, 2.0, seed);
+            for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+                auto res = run_detection(kind, width, depth, snapshots,
+                                         gs, cfg, detector);
+                out << sketch_name(kind) << "," << num_flows << "," << seed << ","
+                    << res.tp << "," << res.fp << "," << res.fn << "," << res.f1()
+                    << "\n";
+            }
+        }
+    }
+}
+
+// Experiment 3: Grey-failure head-to-head.
+// Compares DHS against a scalar heavy-changer detector on streams where
+// packet volume is stable but the latency distribution shifts.  A scalar
+// detector (flags flow when |count_new - count_old| / count_old > 30%)
+// cannot see pure distribution shifts and should score ~0 detection rate,
+// while DHS (normalised L1 > threshold and L1 > floor) flags the change
+// via the differenced histogram.
+static void run_grey_failure_comparison(const fs::path& out_dir, double best_threshold) {
+    constexpr int width = 1024, depth = 3, bins = 10;
+    constexpr int num_flows = 100, num_epochs = 4, epoch_size = 5000;
+    constexpr double zipf_alpha = 1.5;
+    constexpr double abs_floor = 30.0;
+    constexpr double scalar_threshold = 0.30;  // 30% relative count change
+
+    BinConfig cfg(bins, 0.5, 200.0, BinScheme::Logarithmic);
+
+    struct Scenario {
+        const char* name;
+        AnomalyType type;
+        double      magnitude;
+        const char* flow;
+    };
+    const std::vector<Scenario> scenarios = {
+        // SuddenSpike: 10x mean latency increase, packet count unchanged.
+        {"LatencySpike", AnomalyType::SuddenSpike, 10.0, "1"},
+        // Spread: 3x wider latency distribution (sigma × 3), count unchanged.
+        {"Spread",       AnomalyType::Spread,       3.0,  "2"},
+        // GradualRamp: mean grows by 2× per epoch, count unchanged.
+        // start_epoch=0 so that boundary 0→1 already shows steps=1 shift.
+        {"GradualRamp",  AnomalyType::GradualRamp,  2.0,  "3"},
+    };
+
+    std::ofstream out(out_dir / "grey_failure_comparison.csv");
+    out << "seed,sketch,scenario,detected_dhs,detected_scalar,l1,count_ratio\n";
+
+    for (uint32_t seed : {42u, 43u, 44u}) {
+        std::vector<AnomalySpec> specs;
+        for (int i = 0; i < static_cast<int>(scenarios.size()); ++i) {
+            const auto& s = scenarios[i];
+            // GradualRamp needs start_epoch=0 so the epoch-0→1 boundary
+            // captures steps=1 (the first actual ramp step).
+            // SuddenSpike/Spread use start_epoch=1: epoch 0 is normal,
+            // epoch 1 is anomalous, giving a clean epoch-0→1 contrast.
+            int start = (s.type == AnomalyType::GradualRamp) ? 0 : 1;
+            specs.push_back({std::string(s.flow), s.type, start, s.magnitude});
+        }
+
+        auto gs = generate_stream(num_flows, num_epochs, epoch_size, zipf_alpha,
+                                  std::log(5.0), 0.5, specs, seed);
+
+        for (SketchKind kind : {SketchKind::CMS, SketchKind::CUCMS, SketchKind::CS}) {
+            // Build two independent sketches for epochs 0 and 1.
+            auto sk0 = make_sketch(kind, width, depth, cfg);
+            auto sk1 = make_sketch(kind, width, depth, cfg);
+
+            for (const auto& [ts, key, lat] : gs.packets) {
+                int e = static_cast<int>(ts / gs.epoch_duration);
+                if (e == 0)      sk0->update(key, lat);
+                else if (e == 1) sk1->update(key, lat);
+            }
+
+            for (const auto& s : scenarios) {
+                const std::string fid(s.flow);
+                auto diff        = diff_histograms(*sk1, *sk0, fid);
+                auto scores      = compute_scores(diff);
+                double cnt_new   = std::max(1.0, sk1->query(fid));
+                double cnt_old   = std::max(1.0, sk0->query(fid));
+                double norm_l1   = scores.l1 / cnt_old;
+                double cnt_ratio = std::abs(cnt_new - cnt_old) / cnt_old;
+
+                bool dhs_det    = norm_l1 > best_threshold && scores.l1 > abs_floor;
+                bool scalar_det = cnt_ratio > scalar_threshold;
+
+                out << seed << "," << sketch_name(kind) << "," << s.name << ","
+                    << (dhs_det ? 1 : 0) << "," << (scalar_det ? 1 : 0) << ","
+                    << std::fixed << std::setprecision(4)
+                    << scores.l1 << "," << cnt_ratio << "\n";
+            }
+        }
+    }
 }
 
 int main() {
@@ -895,6 +1014,8 @@ int main() {
     run_hash_rotation_experiment(out_dir);
     run_classification_evaluation(out_dir);
     run_epoch_sweep(out_dir, improved);
+    run_flow_count_sweep(out_dir, improved);
+    run_grey_failure_comparison(out_dir, best_threshold);
 
     std::cout << "Generated:\n";
     std::cout << "  outputs/evaluation/histogram_accuracy.csv\n";
@@ -911,5 +1032,7 @@ int main() {
     std::cout << "  outputs/evaluation/per_type_breakdown.csv\n";
     std::cout << "  outputs/evaluation/memory_sweep.csv\n";
     std::cout << "  outputs/evaluation/epoch_sweep.csv\n";
+    std::cout << "  outputs/evaluation/flow_count_sweep.csv\n";
+    std::cout << "  outputs/evaluation/grey_failure_comparison.csv\n";
     return 0;
 }
